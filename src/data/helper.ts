@@ -77,31 +77,47 @@ async function request<URL extends API_PATH>({
     const parsedUrl = url.replace(/:(\w+)/g, (_, param) => params[param]);
     const apiUrl = process.env[`SPOTIFY_API_BASE_URL_${version.toUpperCase()}`];
     const queryString = new URLSearchParams(query).toString();
-    const fullUrl = `${apiUrl}/${parsedUrl}?${queryString}`;
+    const fullUrl =
+      url === "api/token"
+        ? `https://accounts.spotify.com/api/token`
+        : `${apiUrl}/${parsedUrl}?${queryString}`;
 
     const startTime = Date.now();
 
     const response = await fetch(fullUrl, {
       method,
       headers: {
-        "Content-Type": "application/json",
         "User-Agent": `gothru-maps-frontend-${process.env.NODE_ENV}`,
         ...headers,
       },
       ...(method.toLocaleLowerCase() !== "get" && {
-        body: JSON.stringify(body),
+        body:
+          headers["Content-Type"] === "application/x-www-form-urlencoded"
+            ? new URLSearchParams(body).toString()
+            : JSON.stringify(body),
       }),
     });
 
     // Check if the response is OK (status in the range 200-299)
     if (!response.ok) {
       const errorText = await response.text(); // Get the error response text
-      console.error(`Error: ${response.status} - ${errorText}`);
+      let parsedError;
+
+      // Check if errorText is JSON
+      try {
+        parsedError = JSON.parse(errorText);
+      } catch {
+        parsedError = { message: errorText }; // Fallback to plain text error
+      }
+
+      console.error(
+        ` ${method} ${fullUrl} - Error: ${response.status} - ${parsedError.message}`,
+      );
       return [
         null,
         {
           statusCode: response.status,
-          errors: { message: `Error: ${response.status}`, details: errorText },
+          errors: parsedError,
         } as CustomError,
       ];
     }

@@ -1,4 +1,4 @@
-import { QueueResponse } from "./responseTypes";
+import { QueueResponse, TokenResponse } from "./responseTypes";
 
 /**
  * Edit this file to add new API paths and their response types.
@@ -10,6 +10,11 @@ export function getAPIPathMap() {
       response: {} as QueueResponse,
       version: "v1",
       method: "GET",
+    },
+    "api/token": {
+      response: {} as TokenResponse,
+      version: "v1",
+      method: "POST",
     },
   } as const;
 }

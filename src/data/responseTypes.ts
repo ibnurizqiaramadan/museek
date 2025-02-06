@@ -42,7 +42,7 @@ type Album = {
   uri: string;
 };
 
-type Track = {
+export type Track = {
   album: Album;
   artists: Artist[];
   available_markets: string[];
@@ -67,4 +67,11 @@ type Track = {
 export type QueueResponse = {
   currently_playing: Track;
   queue: Track[];
+};
+
+export type TokenResponse = {
+  access_token: string;
+  token_type: string;
+  expires_in: number;
+  scope: string;
 };
