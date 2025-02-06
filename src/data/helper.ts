@@ -56,7 +56,7 @@ async function request<URL extends API_PATH>({ url, method = 'GET', headers = {}
 
   try {
     const parsedUrl = url.replace(/:(\w+)/g, (_, param) => params[param]);
-    const apiUrl = process.env[`API_URL_${version.toUpperCase()}`];
+    const apiUrl = process.env[`SPOTIFY_API_BASE_URL_${version.toUpperCase()}`];
     const queryString = new URLSearchParams(query).toString();
     const fullUrl = `${apiUrl}/${parsedUrl}?${queryString}`;
 
