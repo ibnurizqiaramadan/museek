@@ -7,11 +7,11 @@ export type CustomError = {
   };
 } | null;
 
-type SpotifyUrl = {
+export type SpotifyUrl = {
   spotify: string;
 };
 
-type Artist = {
+export type Artist = {
   external_urls: SpotifyUrl;
   href: string;
   id: string;
@@ -20,13 +20,13 @@ type Artist = {
   uri: string;
 };
 
-type AlbumImage = {
+export type AlbumImage = {
   height: number;
   url: string;
   width: number;
 };
 
-type Album = {
+export type Album = {
   album_type: string;
   artists: Artist[];
   available_markets: string[];
@@ -34,6 +34,7 @@ type Album = {
   href: string;
   id: string;
   images: AlbumImage[];
+  is_playable: boolean;
   name: string;
   release_date: string;
   release_date_precision: string;
@@ -45,7 +46,6 @@ type Album = {
 export type Track = {
   album: Album;
   artists: Artist[];
-  available_markets: string[];
   disc_number: number;
   duration_ms: number;
   explicit: boolean;
@@ -56,12 +56,27 @@ export type Track = {
   href: string;
   id: string;
   is_local: boolean;
+  is_playable: boolean;
   name: string;
   popularity: number;
   preview_url: string | null;
   track_number: number;
   type: "track";
   uri: string;
+};
+
+export type TracksResponse = {
+  href: string;
+  limit: number;
+  next: string | null;
+  offset: number;
+  previous: string | null;
+  total: number;
+  items: Track[];
+};
+
+export type SearchResponse = {
+  tracks: TracksResponse;
 };
 
 export type QueueResponse = {

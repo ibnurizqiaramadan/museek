@@ -25,8 +25,12 @@ export default function Queue() {
           Authorization: `Bearer ${accessToken}`,
         },
       });
-      if (!error) {
-        console.log(response);
+      if (error?.statusCode === 401) {
+        const [response, error] = await getAccessToken();
+        if (!error) {
+          sessionStorage.setItem("accessToken", response?.access_token ?? "");
+          fetchQueue();
+        }
       }
       setQueue(response as QueueResponse);
     };
