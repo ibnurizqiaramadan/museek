@@ -1,4 +1,4 @@
-import { DataRequest, CustomDataResponse } from "../helper";
+import { DataRequest, CustomDataResponse } from "@/data/helper";
 
 export const getQueue = async ({
   accessToken,
