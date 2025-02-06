@@ -1,7 +1,7 @@
-'use server';
+"use server";
 
-import { CustomError } from '@/data/responseTypes';
-import { getAPIPathMap } from '@/data/apiRoutes';
+import { CustomError } from "@/data/responseTypes";
+import { getAPIPathMap } from "@/data/apiRoutes";
 
 /**
  * Represents the available API paths.
@@ -14,9 +14,18 @@ type API_PATH = keyof ReturnType<typeof getAPIPathMap>;
  * @template S
  * @typedef {ReturnType<typeof getAPIPathMap>[S]['response']} DataHelperResponse
  */
-type DataHelperResponse<S extends API_PATH> = ReturnType<typeof getAPIPathMap>[S]['response'];
+type DataHelperResponse<S extends API_PATH> = ReturnType<
+  typeof getAPIPathMap
+>[S]["response"];
 
-type FetchMethods = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH' | 'HEAD' | 'OPTIONS'
+type FetchMethods =
+  | "GET"
+  | "POST"
+  | "PUT"
+  | "DELETE"
+  | "PATCH"
+  | "HEAD"
+  | "OPTIONS";
 
 /**
  * Options for making a request.
@@ -42,7 +51,10 @@ interface RequestOptions {
  * @template T
  * @typedef {Array<DataHelperResponse<T> | null, CustomError | null>} CustomDataResponse
  */
-export type CustomDataResponse<T extends API_PATH> = [DataHelperResponse<T> | null, CustomError | null];
+export type CustomDataResponse<T extends API_PATH> = [
+  DataHelperResponse<T> | null,
+  CustomError | null,
+];
 
 /**
  * Makes an API request.
@@ -50,7 +62,14 @@ export type CustomDataResponse<T extends API_PATH> = [DataHelperResponse<T> | nu
  * @param {RequestOptions} options - The options for the request.
  * @returns {Promise<CustomDataResponse<URL>>} The response data and error.
  */
-async function request<URL extends API_PATH>({ url, method = 'GET', headers = {}, query = {}, params = {}, body = {} }: RequestOptions): Promise<CustomDataResponse<URL>> {
+async function request<URL extends API_PATH>({
+  url,
+  method = "GET",
+  headers = {},
+  query = {},
+  params = {},
+  body = {},
+}: RequestOptions): Promise<CustomDataResponse<URL>> {
   const API_PATH_MAP = getAPIPathMap();
   const version = API_PATH_MAP[url].version;
 
@@ -65,30 +84,38 @@ async function request<URL extends API_PATH>({ url, method = 'GET', headers = {}
     const response = await fetch(fullUrl, {
       method,
       headers: {
-        'Content-Type': 'application/json',
-        'User-Agent': `gothru-maps-frontend-${process.env.NODE_ENV}`,
+        "Content-Type": "application/json",
+        "User-Agent": `gothru-maps-frontend-${process.env.NODE_ENV}`,
         ...headers,
       },
-      ...(method.toLocaleLowerCase() !== 'get' && { body: JSON.stringify(body) }),
+      ...(method.toLocaleLowerCase() !== "get" && {
+        body: JSON.stringify(body),
+      }),
     });
 
     // Check if the response is OK (status in the range 200-299)
     if (!response.ok) {
       const errorText = await response.text(); // Get the error response text
       console.error(`Error: ${response.status} - ${errorText}`);
-      return [ null, { statusCode: response.status, errors: { message: `Error: ${response.status}`, details: errorText } } as CustomError ];
+      return [
+        null,
+        {
+          statusCode: response.status,
+          errors: { message: `Error: ${response.status}`, details: errorText },
+        } as CustomError,
+      ];
     }
 
     // Attempt to parse the response as JSON
-    const data = await response.json() as DataHelperResponse<URL>;
+    const data = (await response.json()) as DataHelperResponse<URL>;
     const endTime = Date.now();
     const duration = endTime - startTime;
     console.info(` API : ${method} ${fullUrl} - ${duration}ms`);
 
-    return [ data, null ];
+    return [data, null];
   } catch (error) {
     console.error(error);
-    return [ null, error as CustomError ];
+    return [null, error as CustomError];
   }
 }
 
@@ -98,7 +125,10 @@ async function request<URL extends API_PATH>({ url, method = 'GET', headers = {}
  * @param {Omit<RequestOptions, 'method'>} options - The options for the request.
  * @returns {Promise<CustomDataResponse<URL>>} The response data and error.
  */
-export const get = async <URL extends API_PATH>(options: Omit<RequestOptions, 'method'>): Promise<CustomDataResponse<URL>> => request<URL>({ ...options, method: 'GET' });
+export const get = async <URL extends API_PATH>(
+  options: Omit<RequestOptions, "method">,
+): Promise<CustomDataResponse<URL>> =>
+  request<URL>({ ...options, method: "GET" });
 
 /**
  * Makes a POST request.
@@ -106,7 +136,10 @@ export const get = async <URL extends API_PATH>(options: Omit<RequestOptions, 'm
  * @param {Omit<RequestOptions, 'method'>} options - The options for the request.
  * @returns {Promise<CustomDataResponse<URL>>} The response data and error.
  */
-export const post = async <URL extends API_PATH>(options: Omit<RequestOptions, 'method'>): Promise<CustomDataResponse<URL>> => request<URL>({ ...options, method: 'POST' });
+export const post = async <URL extends API_PATH>(
+  options: Omit<RequestOptions, "method">,
+): Promise<CustomDataResponse<URL>> =>
+  request<URL>({ ...options, method: "POST" });
 
 /**
  * Makes a PUT request.
@@ -114,7 +147,10 @@ export const post = async <URL extends API_PATH>(options: Omit<RequestOptions, '
  * @param {Omit<RequestOptions, 'method'>} options - The options for the request.
  * @returns {Promise<CustomDataResponse<URL>>} The response data and error.
  */
-export const put = async <URL extends API_PATH>(options: Omit<RequestOptions, 'method'>): Promise<CustomDataResponse<URL>> => request<URL>({ ...options, method: 'PUT' });
+export const put = async <URL extends API_PATH>(
+  options: Omit<RequestOptions, "method">,
+): Promise<CustomDataResponse<URL>> =>
+  request<URL>({ ...options, method: "PUT" });
 
 /**
  * Makes a DELETE request.
@@ -122,7 +158,10 @@ export const put = async <URL extends API_PATH>(options: Omit<RequestOptions, 'm
  * @param {Omit<RequestOptions, 'method'>} options - The options for the request.
  * @returns {Promise<CustomDataResponse<URL>>} The response data and error.
  */
-export const del = async <URL extends API_PATH>(options: Omit<RequestOptions, 'method'>): Promise<CustomDataResponse<URL>> => request<URL>({ ...options, method: 'DELETE' });
+export const del = async <URL extends API_PATH>(
+  options: Omit<RequestOptions, "method">,
+): Promise<CustomDataResponse<URL>> =>
+  request<URL>({ ...options, method: "DELETE" });
 
 /**
  * Makes a PATCH request.
@@ -130,8 +169,10 @@ export const del = async <URL extends API_PATH>(options: Omit<RequestOptions, 'm
  * @param {Omit<RequestOptions, 'method'>} options - The options for the request.
  * @returns {Promise<CustomDataResponse<URL>>} The response data and error.
  */
-export const patch = async <URL extends API_PATH>(options: Omit<RequestOptions, 'method'>): Promise<CustomDataResponse<URL>> => request<URL>({ ...options, method: 'PATCH' });
-
+export const patch = async <URL extends API_PATH>(
+  options: Omit<RequestOptions, "method">,
+): Promise<CustomDataResponse<URL>> =>
+  request<URL>({ ...options, method: "PATCH" });
 
 /**
  * Makes an API request with automatic method selection.
@@ -140,10 +181,9 @@ export const patch = async <URL extends API_PATH>(options: Omit<RequestOptions, 
  * @returns {Promise<CustomDataResponse<URL>>} The response data and error.
  */
 export const DataRequest = async <URL extends API_PATH>(
-  options: Omit<RequestOptions, 'method'>
+  options: Omit<RequestOptions, "method">,
 ): Promise<CustomDataResponse<URL>> => {
   const API_PATH_MAP = getAPIPathMap();
   const method = API_PATH_MAP[options.url].method;
   return request<URL>({ ...options, method });
 };
-
