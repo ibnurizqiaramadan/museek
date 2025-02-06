@@ -4,10 +4,10 @@ import { post } from "@/data/helper";
 import { CustomDataResponse } from "@/data/helper";
 
 export const getAccessToken = async (): Promise<
-  CustomDataResponse<"api/token">
+  CustomDataResponse<"post:api/token">
 > => {
   return post({
-    url: "api/token",
+    url: "post:api/token",
     headers: {
       "Content-Type": "application/x-www-form-urlencoded",
       Authorization: `Basic ${Buffer.from(

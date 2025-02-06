@@ -1,53 +1,54 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { getAccessToken } from "@/data/layer/auth";
-import { QueueResponse } from "@/data/responseTypes";
+import { getQueue } from "@/data/layer/player";
 import QueueItem from "@/components/queue/QueueItem";
-// import data from "./data.json";
-import { DataRequest } from "@/data/helper";
+import { appStore } from "@/stores/AppStores";
 
 export default function Queue() {
-  const [queue, setQueue] = useState<QueueResponse | null>(null);
+  const { app, setQueue } = appStore((state) => state);
 
   useEffect(() => {
-    const fetchQueue = async () => {
-      const accessToken = sessionStorage.getItem("accessToken");
+    const fetchQueue = async (accessToken: string | null) => {
       if (!accessToken) {
         const [response, error] = await getAccessToken();
-        if (!error)
-          sessionStorage.setItem("accessToken", response?.access_token ?? "");
-      }
-
-      const [response, error] = await DataRequest({
-        url: "me/player/queue",
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      });
-      if (error?.statusCode === 401) {
-        const [response, error] = await getAccessToken();
         if (!error) {
+          fetchQueue(response?.access_token ?? null);
           sessionStorage.setItem("accessToken", response?.access_token ?? "");
-          fetchQueue();
+          return;
         }
       }
-      setQueue(response as QueueResponse);
+
+      const [response, error] = await getQueue({
+        accessToken: accessToken ?? "",
+      });
+      if (error?.statusCode === 401) {
+        await getAccessToken().then(([response, error]) => {
+          if (!error) {
+            sessionStorage.setItem("accessToken", response?.access_token ?? "");
+            fetchQueue(response?.access_token ?? null);
+          }
+        });
+      }
+      setQueue(response);
     };
 
-    fetchQueue();
-  }, []);
+    fetchQueue(sessionStorage.getItem("accessToken") ?? null);
+  }, [setQueue]);
 
   return (
     <div className="flex flex-col bg-zinc-900 overflow-auto rounded-lg h-full w-1/2 min-w-[500px] p-2">
       <div className="overflow-y-auto max-h-[calc(100vh-186px)]">
-        {queue?.currently_playing && (
+        {app?.queue?.currently_playing && (
           <QueueItem
-            key={queue.currently_playing.id}
-            item={queue.currently_playing}
+            key={app.queue.currently_playing.id}
+            item={app.queue.currently_playing}
           />
         )}
-        {queue?.queue.map((item) => <QueueItem key={item.id} item={item} />)}
+        {app?.queue?.queue?.map((item) => (
+          <QueueItem key={item.id} item={item} />
+        ))}
       </div>
     </div>
   );

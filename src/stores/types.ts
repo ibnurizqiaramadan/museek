@@ -1,6 +1,12 @@
+import { Track, SearchResponse, QueueResponse } from "@/data/responseTypes";
+
 export type AppStore = {
   app: {
-    socket: undefined;
+    search: SearchResponse | null;
+    queue: QueueResponse | null;
   };
-  setSocket: (socket: undefined) => void;
+  setSearch: (search: SearchResponse | null) => void;
+  setQueue: (queue: QueueResponse | null) => void;
+  setCurrentlyPlaying: (currentlyPlaying: Track | null) => void;
+  setSearchResults: (searchResults: SearchResponse | null) => void;
 };

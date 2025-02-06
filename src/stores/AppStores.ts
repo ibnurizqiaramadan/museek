@@ -3,7 +3,14 @@ import { create } from "zustand";
 
 export const appStore = create<AppStore>((set) => ({
   app: {
-    socket: undefined,
+    search: null,
+    queue: null,
+    currentlyPlaying: null,
   },
-  setSocket: (socket) => set((state) => ({ app: { ...state.app, socket } })),
+  setSearch: (search) => set((state) => ({ app: { ...state.app, search } })),
+  setQueue: (queue) => set((state) => ({ app: { ...state.app, queue } })),
+  setCurrentlyPlaying: (currentlyPlaying) =>
+    set((state) => ({ app: { ...state.app, currentlyPlaying } })),
+  setSearchResults: (searchResults) =>
+    set((state) => ({ app: { ...state.app, searchResults } })),
 }));

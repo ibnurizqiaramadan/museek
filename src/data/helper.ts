@@ -64,7 +64,6 @@ export type CustomDataResponse<T extends API_PATH> = [
  */
 async function request<URL extends API_PATH>({
   url,
-  method = "GET",
   headers = {},
   query = {},
   params = {},
@@ -74,11 +73,13 @@ async function request<URL extends API_PATH>({
   const version = API_PATH_MAP[url].version;
 
   try {
-    const parsedUrl = url.replace(/:(\w+)/g, (_, param) => params[param]);
+    const method = url.split(":")[0];
+    const apiPath = url.split(":")[1];
+    const parsedUrl = apiPath.replace(/:(\w+)/g, (_, param) => params[param]);
     const apiUrl = process.env[`SPOTIFY_API_BASE_URL_${version.toUpperCase()}`];
     const queryString = new URLSearchParams(query).toString();
     const fullUrl =
-      url === "api/token"
+      apiPath === "api/token"
         ? `https://accounts.spotify.com/api/token`
         : `${apiUrl}/${parsedUrl}?${queryString}`;
 
@@ -199,7 +200,6 @@ export const patch = async <URL extends API_PATH>(
 export const DataRequest = async <URL extends API_PATH>(
   options: Omit<RequestOptions, "method">,
 ): Promise<CustomDataResponse<URL>> => {
-  const API_PATH_MAP = getAPIPathMap();
-  const method = API_PATH_MAP[options.url].method;
+  const method = options.url.split(":")[0] as FetchMethods;
   return request<URL>({ ...options, method });
 };
