@@ -36,7 +36,7 @@ export default function Queue() {
 
   return (
     <div className="flex flex-col bg-zinc-900 overflow-auto rounded-lg h-full w-1/2 min-w-[500px] p-2">
-      <div className="overflow-y-auto max-h-[calc(100vh-180px)]">
+      <div className="overflow-y-auto max-h-[calc(100vh-186px)]">
         {queue?.currently_playing && (
           <QueueItem
             key={queue.currently_playing.id}
