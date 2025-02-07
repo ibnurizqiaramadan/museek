@@ -7,30 +7,27 @@ import { useState, useCallback } from "react";
 import { appStore } from "@/stores/AppStores";
 
 export default function Search() {
-  const { setSearch } = appStore((state) => state);
+  const { setSearch, setRefreshQueue } = appStore((state) => state);
   const [inputSearch, setInputSearch] = useState("");
 
-  const fetchSearch = useCallback(async () => {
-    const accessToken = sessionStorage.getItem("accessToken");
-    if (!accessToken) {
-      const [response, error] = await getAccessToken();
-      if (!error)
-        sessionStorage.setItem("accessToken", response?.access_token ?? "");
-    }
-
-    const [response, error] = await SearchSpotify({
-      accessToken: accessToken ?? "",
-      query: inputSearch,
-    });
-    if (error?.statusCode === 401) {
-      const [response, error] = await getAccessToken();
-      if (!error) {
-        sessionStorage.setItem("accessToken", response?.access_token ?? "");
-        fetchSearch();
+  const fetchSearch = useCallback(
+    async (accessToken: string | null) => {
+      const [response, error] = await SearchSpotify({
+        accessToken: accessToken ?? "",
+        query: inputSearch,
+      });
+      if (error?.statusCode === 401) {
+        const [response, error] = await getAccessToken();
+        if (!error) {
+          sessionStorage.setItem("accessToken", response?.access_token ?? "");
+          fetchSearch(response?.access_token ?? null);
+        }
       }
-    }
-    setSearch(response);
-  }, [inputSearch, setSearch]);
+      setSearch(response);
+      setRefreshQueue(true);
+    },
+    [inputSearch, setSearch, setRefreshQueue],
+  );
 
   return (
     <div className="flex items-center justify-center">
@@ -43,7 +40,7 @@ export default function Search() {
         }}
         onKeyDown={(e) => {
           if (e.key === "Enter") {
-            fetchSearch();
+            fetchSearch(sessionStorage.getItem("accessToken") ?? null);
           }
         }}
       />

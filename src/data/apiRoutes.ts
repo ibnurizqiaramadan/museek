@@ -1,4 +1,9 @@
-import { QueueResponse, SearchResponse, TokenResponse } from "./responseTypes";
+import {
+  QueueResponse,
+  SearchResponse,
+  TokenResponse,
+  DeviceResponse,
+} from "./responseTypes";
 
 /**
  * Edit this file to add new API paths and their response types.
@@ -12,6 +17,10 @@ export function getAPIPathMap() {
     },
     "post:me/player/queue": {
       response: {} as QueueResponse,
+      version: "v1",
+    },
+    "get:me/player/devices": {
+      response: {} as DeviceResponse,
       version: "v1",
     },
     "post:api/token": {

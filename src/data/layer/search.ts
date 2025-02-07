@@ -1,3 +1,5 @@
+"use server";
+
 import { DataRequest, CustomDataResponse } from "@/data/helper";
 
 export const SearchSpotify = async ({
@@ -14,7 +16,7 @@ export const SearchSpotify = async ({
     },
     query: {
       q: query,
-      type: "track",
+      type: "track,album,artist,playlist",
       market: "ID",
     },
   });

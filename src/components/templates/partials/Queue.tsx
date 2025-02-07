@@ -1,54 +1,80 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef, useCallback } from "react";
 import { getAccessToken } from "@/data/layer/auth";
 import { getQueue } from "@/data/layer/player";
 import QueueItem from "@/components/queue/QueueItem";
 import { appStore } from "@/stores/AppStores";
 
 export default function Queue() {
-  const { app, setQueue } = appStore((state) => state);
+  const { app, setQueue, setRefreshQueue } = appStore((state) => state);
+  const prevQueueRef = useRef(app.queue);
 
-  useEffect(() => {
-    const fetchQueue = async (accessToken: string | null) => {
-      if (!accessToken) {
-        const [response, error] = await getAccessToken();
-        if (!error) {
-          fetchQueue(response?.access_token ?? null);
-          sessionStorage.setItem("accessToken", response?.access_token ?? "");
-          return;
-        }
-      }
-
+  const fetchQueue = useCallback(
+    async (accessToken: string | null) => {
       const [response, error] = await getQueue({
         accessToken: accessToken ?? "",
       });
-      if (error?.statusCode === 401) {
+      if (error?.statusCode === 401 || error?.statusCode === 400) {
         await getAccessToken().then(([response, error]) => {
+          console.log(response, error);
           if (!error) {
             sessionStorage.setItem("accessToken", response?.access_token ?? "");
             fetchQueue(response?.access_token ?? null);
           }
         });
       }
-      setQueue(response);
-    };
 
+      if (JSON.stringify(response) !== JSON.stringify(prevQueueRef.current)) {
+        console.log(response);
+        setQueue(response);
+        prevQueueRef.current = response;
+      }
+    },
+    [setQueue],
+  );
+
+  useEffect(() => {
     fetchQueue(sessionStorage.getItem("accessToken") ?? null);
-  }, [setQueue]);
+  }, [fetchQueue]);
+
+  useEffect(() => {
+    if (app.refreshQueue) {
+      fetchQueue(sessionStorage.getItem("accessToken") ?? null);
+      setRefreshQueue(false);
+    }
+  }, [app, app.refreshQueue, fetchQueue, setRefreshQueue]);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      fetchQueue(sessionStorage.getItem("accessToken") ?? null);
+    }, 30000);
+    return () => clearInterval(interval);
+  }, [fetchQueue]);
 
   return (
     <div className="flex flex-col bg-zinc-900 overflow-auto rounded-lg h-full w-1/2 min-w-[500px] p-2">
-      <div className="overflow-y-auto max-h-[calc(100vh-186px)]">
-        {app?.queue?.currently_playing && (
-          <QueueItem
-            key={app.queue.currently_playing.id}
-            item={app.queue.currently_playing}
-          />
+      <div className="overflow-y-auto max-h-[calc(100vh-186px)] max-w-[calc(100%)] overflow-hidden text-ellipsis whitespace-nowrap">
+        {app?.queue?.queue?.length && app?.queue?.queue?.length > 0 && (
+          <>
+            <div>
+              <h4 className="text-large font-bold px-2">Now Playing</h4>
+              {app?.queue?.currently_playing && (
+                <QueueItem
+                  key={app.queue.currently_playing.id}
+                  item={app.queue.currently_playing}
+                  currentPlaying={true}
+                />
+              )}
+            </div>
+            <div>
+              <h4 className="text-large font-bold px-2">Next Queue</h4>
+              {app?.queue?.queue?.map((item, index) => (
+                <QueueItem key={index} item={item} />
+              ))}
+            </div>
+          </>
         )}
-        {app?.queue?.queue?.map((item) => (
-          <QueueItem key={item.id} item={item} />
-        ))}
       </div>
     </div>
   );

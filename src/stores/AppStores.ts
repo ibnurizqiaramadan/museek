@@ -6,6 +6,9 @@ export const appStore = create<AppStore>((set) => ({
     search: null,
     queue: null,
     currentlyPlaying: null,
+    refreshQueue: false,
+    devices: null,
+    selectedDevice: null,
   },
   setSearch: (search) => set((state) => ({ app: { ...state.app, search } })),
   setQueue: (queue) => set((state) => ({ app: { ...state.app, queue } })),
@@ -13,4 +16,9 @@ export const appStore = create<AppStore>((set) => ({
     set((state) => ({ app: { ...state.app, currentlyPlaying } })),
   setSearchResults: (searchResults) =>
     set((state) => ({ app: { ...state.app, searchResults } })),
+  setRefreshQueue: (refreshQueue) =>
+    set((state) => ({ app: { ...state.app, refreshQueue } })),
+  setDevices: (devices) => set((state) => ({ app: { ...state.app, devices } })),
+  setSelectedDevice: (selectedDevice) =>
+    set((state) => ({ app: { ...state.app, selectedDevice } })),
 }));
