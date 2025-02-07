@@ -16,7 +16,7 @@ export function getAPIPathMap() {
       version: "v1",
     },
     "post:me/player/queue": {
-      response: {} as QueueResponse,
+      response: {} as string,
       version: "v1",
     },
     "get:me/player/devices": {

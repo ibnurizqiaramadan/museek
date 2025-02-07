@@ -27,3 +27,21 @@ export const getDevices = async ({
     },
   });
 };
+
+export const addToQueue = async ({
+  accessToken,
+  uri,
+}: {
+  accessToken: string;
+  uri: string;
+}): Promise<CustomDataResponse<"post:me/player/queue">> => {
+  return DataRequest({
+    url: "post:me/player/queue",
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
+    query: {
+      uri,
+    },
+  });
+};
