@@ -2,6 +2,7 @@
 
 import { CustomError } from "@/data/responseTypes";
 import { getAPIPathMap } from "@/data/apiRoutes";
+import { unstable_cache, revalidateTag } from "next/cache";
 
 /**
  * Represents the available API paths.
@@ -36,6 +37,10 @@ type FetchMethods =
  * @property {Record<string, string>} [query] - Query parameters for the request.
  * @property {Record<string, string>} [params] - URL parameters for the request.
  * @property {Record<string, string>} [headers] - Custom headers for the request.
+ * @property {boolean} [useCache=false] - Whether to use caching.
+ * @property {string} [cacheKey] - The cache key for the request.
+ * @property {string} [revalidateKey] - The revalidate key for the request.
+ * @property {number} [revalidateTime=60] - The revalidate time for the request.
  */
 interface RequestOptions {
   url: API_PATH;
@@ -44,6 +49,10 @@ interface RequestOptions {
   query?: Record<string, string>;
   params?: Record<string, string>;
   headers?: Record<string, string>;
+  useCache?: boolean;
+  cacheKey?: string;
+  revalidateKey?: string;
+  revalidateTime?: number;
 }
 
 /**
@@ -62,7 +71,7 @@ export type CustomDataResponse<T extends API_PATH> = [
  * @param {RequestOptions} options - The options for the request.
  * @returns {Promise<CustomDataResponse<URL>>} The response data and error.
  */
-async function request<URL extends API_PATH>({
+async function fetchAPI<URL extends API_PATH>({
   url,
   headers = {},
   query = {},
@@ -88,7 +97,7 @@ async function request<URL extends API_PATH>({
     const response = await fetch(fullUrl, {
       method,
       headers: {
-        "User-Agent": `gothru-maps-frontend-${process.env.NODE_ENV}`,
+        "User-Agent": `spotify-bot-${process.env.NODE_ENV}`,
         ...headers,
       },
       ...(method.toLocaleLowerCase() !== "get" && {
@@ -142,6 +151,43 @@ async function request<URL extends API_PATH>({
     console.error(error);
     return [null, error as CustomError];
   }
+}
+
+/**
+ * Makes an API request with caching and revalidation.
+ * @template URL
+ * @param {RequestOptions} options - The options for the request.
+ * @returns {Promise<CustomDataResponse<URL>>} The response data and error.
+ */
+async function request<URL extends API_PATH>(
+  options: RequestOptions,
+): Promise<CustomDataResponse<URL>> {
+  const {
+    method = "get",
+    useCache = false,
+    cacheKey = "",
+    revalidateKey = "",
+    revalidateTime = 60,
+  } = options;
+  if (revalidateKey !== "") revalidateTag(revalidateKey);
+  if (useCache && method === "get") {
+    const key =
+      cacheKey === ""
+        ? `${options.url}-${JSON.stringify(options.query || {})}`
+        : cacheKey;
+    return unstable_cache(
+      () => {
+        return fetchAPI<URL>(options);
+      },
+      [key],
+      {
+        revalidate: revalidateTime,
+        tags: [key],
+      },
+    )();
+  }
+
+  return fetchAPI<URL>(options);
 }
 
 /**

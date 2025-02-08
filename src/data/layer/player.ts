@@ -12,6 +12,9 @@ export const getQueue = async ({
     headers: {
       Authorization: `Bearer ${accessToken}`,
     },
+    useCache: true,
+    cacheKey: "music-queue",
+    revalidateTime: 180,
   });
 };
 
@@ -25,6 +28,7 @@ export const getDevices = async ({
     headers: {
       Authorization: `Bearer ${accessToken}`,
     },
+    useCache: true,
   });
 };
 
@@ -43,5 +47,6 @@ export const addToQueue = async ({
     query: {
       uri,
     },
+    revalidateKey: "music-queue",
   });
 };

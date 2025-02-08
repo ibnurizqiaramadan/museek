@@ -19,5 +19,7 @@ export const SearchSpotify = async ({
       type: "track,album,artist,playlist",
       market: "ID",
     },
+    useCache: true,
+    revalidateTime: 180,
   });
 };
