@@ -19,5 +19,6 @@ export const getAccessToken = async (): Promise<
       refresh_token: process.env.SPOTIFY_REFRESH_TOKEN,
       client_id: process.env.SPOTIFY_CLIENT_ID,
     },
+    useCache: false,
   });
 };
