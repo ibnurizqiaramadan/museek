@@ -11,9 +11,10 @@ export default function Queue() {
   const prevQueueRef = useRef(app.queue);
 
   const fetchQueue = useCallback(
-    async (accessToken: string | null) => {
+    async (accessToken: string | null, useCache = true) => {
       const [response, error] = await getQueue({
         accessToken: accessToken ?? "",
+        useCache,
       });
       if (error?.statusCode === 401 || error?.statusCode === 400) {
         await getAccessToken().then(([response, error]) => {
@@ -27,6 +28,9 @@ export default function Queue() {
 
       if (JSON.stringify(response) !== JSON.stringify(prevQueueRef.current)) {
         console.log(response);
+        if (response?.queue.length && response?.queue.length < 0) {
+          fetchQueue(sessionStorage.getItem("accessToken") ?? null, false);
+        }
         setQueue(response);
         prevQueueRef.current = response;
       }

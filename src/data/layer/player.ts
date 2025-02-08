@@ -4,15 +4,17 @@ import { DataRequest, CustomDataResponse } from "@/data/helper";
 
 export const getQueue = async ({
   accessToken,
+  useCache = true,
 }: {
   accessToken: string;
+  useCache?: boolean;
 }): Promise<CustomDataResponse<"get:me/player/queue">> => {
   return DataRequest({
     url: "get:me/player/queue",
     headers: {
       Authorization: `Bearer ${accessToken}`,
     },
-    useCache: true,
+    useCache,
     cacheKey: "music-queue",
     revalidateTime: 180,
   });
