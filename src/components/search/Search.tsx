@@ -1,33 +1,20 @@
 "use client";
 
-import { getAccessToken } from "@/data/layer/auth";
 import { SearchSpotify } from "@/data/layer/search";
 import { Input } from "@heroui/react";
 import { useState, useCallback } from "react";
 import { appStore } from "@/stores/AppStores";
 
 export default function Search() {
-  const { setSearch, setRefreshQueue } = appStore((state) => state);
+  const { setSearch } = appStore((state) => state);
   const [inputSearch, setInputSearch] = useState("");
 
-  const fetchSearch = useCallback(
-    async (accessToken: string | null) => {
-      const [response, error] = await SearchSpotify({
-        accessToken: accessToken ?? "",
-        query: inputSearch,
-      });
-      if (error?.statusCode === 401) {
-        const [response, error] = await getAccessToken();
-        if (!error) {
-          sessionStorage.setItem("accessToken", response?.access_token ?? "");
-          fetchSearch(response?.access_token ?? null);
-        }
-      }
-      setSearch(response);
-      setRefreshQueue(true);
-    },
-    [inputSearch, setSearch, setRefreshQueue],
-  );
+  const fetchSearch = useCallback(async () => {
+    const [response, error] = await SearchSpotify({ query: inputSearch });
+    if (error) console.log("error", error);
+    setSearch(response);
+    // setRefreshQueue(true);
+  }, [inputSearch, setSearch]);
 
   return (
     <div className="flex items-center justify-center">
@@ -37,12 +24,12 @@ export default function Search() {
         placeholder="Search"
         onChange={(e) => {
           setInputSearch(e.target.value);
+          fetchSearch();
         }}
-        onKeyDown={(e) => {
-          if (e.key === "Enter") {
-            fetchSearch(sessionStorage.getItem("accessToken") ?? null);
-          }
-        }}
+        // onKeyDown={(e) => {
+        //   if (e.key === "Enter") {
+        //   }
+        // }}
       />
     </div>
   );

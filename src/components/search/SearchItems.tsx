@@ -20,7 +20,6 @@ const SearchItems = ({ item }: { item: Track }) => {
         if (isLoading) return;
         setIsLoading(true);
         addToQueue({
-          accessToken: sessionStorage.getItem("accessToken") ?? "",
           uri: item.uri,
         }).then(([response, error]) => {
           if (error) console.log(error);

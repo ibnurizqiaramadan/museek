@@ -9,23 +9,14 @@ import {
 
 import { getDevices } from "@/data/layer/player";
 import { appStore } from "@/stores/AppStores";
-import { getAccessToken } from "@/data/layer/auth";
 
 export default function ListDevice() {
   const { app, setDevices, setSelectedDevice } = appStore((state) => state);
 
   const fetchDevices = useCallback(async () => {
-    const [response, error] = await getDevices({
-      accessToken: sessionStorage.getItem("accessToken") ?? "",
-    });
-    if (error?.statusCode === 401 || error?.statusCode === 400) {
-      await getAccessToken().then(([response, error]) => {
-        console.log(response, error);
-        if (!error) {
-          sessionStorage.setItem("accessToken", response?.access_token ?? "");
-          fetchDevices();
-        }
-      });
+    const [response, error] = await getDevices();
+    if (error) {
+      console.log(error);
     }
     setDevices(response);
     console.log(response);

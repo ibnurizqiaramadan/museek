@@ -2,11 +2,12 @@
 
 import { post } from "@/data/helper";
 import { CustomDataResponse } from "@/data/helper";
+import { getRedisClient } from "@/server/redis";
 
 export const getAccessToken = async (): Promise<
   CustomDataResponse<"post:api/token">
 > => {
-  return post({
+  const [response, error]: CustomDataResponse<"post:api/token"> = await post({
     url: "post:api/token",
     headers: {
       "Content-Type": "application/x-www-form-urlencoded",
@@ -21,4 +22,14 @@ export const getAccessToken = async (): Promise<
     },
     useCache: false,
   });
+
+  if (response) {
+    await (
+      await getRedisClient()
+    ).set("accessToken", response.access_token, {
+      EX: 3600,
+    });
+  }
+
+  return [response, error];
 };

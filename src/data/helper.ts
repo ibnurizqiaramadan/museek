@@ -41,9 +41,10 @@ type FetchMethods =
  * @property {string} [cacheKey] - The cache key for the request.
  * @property {string} [revalidateKey] - The revalidate key for the request.
  * @property {number} [revalidateTime=60] - The revalidate time for the request.
+ * @property {(data: DataHelperResponse<URL> | null) => void} [cacheFn] - The cache function for the request.
  */
-interface RequestOptions {
-  url: API_PATH;
+interface RequestOptions<URL extends API_PATH = API_PATH> {
+  url: URL;
   method?: FetchMethods;
   body?: Record<string, string>;
   query?: Record<string, string>;
@@ -53,6 +54,7 @@ interface RequestOptions {
   cacheKey?: string;
   revalidateKey?: string;
   revalidateTime?: number;
+  cacheFn?: (data: DataHelperResponse<URL> | null) => void;
 }
 
 /**
@@ -77,7 +79,7 @@ async function fetchAPI<URL extends API_PATH>({
   query = {},
   params = {},
   body = {},
-}: RequestOptions): Promise<CustomDataResponse<URL>> {
+}: RequestOptions<URL>): Promise<CustomDataResponse<URL>> {
   const API_PATH_MAP = getAPIPathMap();
   const version = API_PATH_MAP[url].version;
 
@@ -160,7 +162,7 @@ async function fetchAPI<URL extends API_PATH>({
  * @returns {Promise<CustomDataResponse<URL>>} The response data and error.
  */
 async function request<URL extends API_PATH>(
-  options: RequestOptions,
+  options: RequestOptions<URL>,
 ): Promise<CustomDataResponse<URL>> {
   const {
     method = "get",
@@ -197,7 +199,7 @@ async function request<URL extends API_PATH>(
  * @returns {Promise<CustomDataResponse<URL>>} The response data and error.
  */
 export const get = async <URL extends API_PATH>(
-  options: Omit<RequestOptions, "method">,
+  options: Omit<RequestOptions<URL>, "method">,
 ): Promise<CustomDataResponse<URL>> =>
   request<URL>({ ...options, method: "GET" });
 
@@ -208,7 +210,7 @@ export const get = async <URL extends API_PATH>(
  * @returns {Promise<CustomDataResponse<URL>>} The response data and error.
  */
 export const post = async <URL extends API_PATH>(
-  options: Omit<RequestOptions, "method">,
+  options: Omit<RequestOptions<URL>, "method">,
 ): Promise<CustomDataResponse<URL>> =>
   request<URL>({ ...options, method: "POST" });
 
@@ -219,7 +221,7 @@ export const post = async <URL extends API_PATH>(
  * @returns {Promise<CustomDataResponse<URL>>} The response data and error.
  */
 export const put = async <URL extends API_PATH>(
-  options: Omit<RequestOptions, "method">,
+  options: Omit<RequestOptions<URL>, "method">,
 ): Promise<CustomDataResponse<URL>> =>
   request<URL>({ ...options, method: "PUT" });
 
@@ -230,7 +232,7 @@ export const put = async <URL extends API_PATH>(
  * @returns {Promise<CustomDataResponse<URL>>} The response data and error.
  */
 export const del = async <URL extends API_PATH>(
-  options: Omit<RequestOptions, "method">,
+  options: Omit<RequestOptions<URL>, "method">,
 ): Promise<CustomDataResponse<URL>> =>
   request<URL>({ ...options, method: "DELETE" });
 
@@ -241,7 +243,7 @@ export const del = async <URL extends API_PATH>(
  * @returns {Promise<CustomDataResponse<URL>>} The response data and error.
  */
 export const patch = async <URL extends API_PATH>(
-  options: Omit<RequestOptions, "method">,
+  options: Omit<RequestOptions<URL>, "method">,
 ): Promise<CustomDataResponse<URL>> =>
   request<URL>({ ...options, method: "PATCH" });
 
@@ -252,8 +254,10 @@ export const patch = async <URL extends API_PATH>(
  * @returns {Promise<CustomDataResponse<URL>>} The response data and error.
  */
 export const DataRequest = async <URL extends API_PATH>(
-  options: Omit<RequestOptions, "method">,
+  options: Omit<RequestOptions<URL>, "method">,
 ): Promise<CustomDataResponse<URL>> => {
   const method = options.url.split(":")[0] as FetchMethods;
-  return request<URL>({ ...options, method });
+  const [data, error] = await request<URL>({ ...options, method });
+  if (options.cacheFn) options.cacheFn(data);
+  return [data, error];
 };

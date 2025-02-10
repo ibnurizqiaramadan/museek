@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useRef, useCallback } from "react";
-import { getAccessToken } from "@/data/layer/auth";
 import { getQueue } from "@/data/layer/player";
 import QueueItem from "@/components/queue/QueueItem";
 import { appStore } from "@/stores/AppStores";
@@ -10,48 +9,34 @@ export default function Queue() {
   const { app, setQueue, setRefreshQueue } = appStore((state) => state);
   const prevQueueRef = useRef(app.queue);
 
-  const fetchQueue = useCallback(
-    async (accessToken: string | null, useCache = true) => {
-      const [response, error] = await getQueue({
-        accessToken: accessToken ?? "",
-        useCache,
-      });
-      if (error?.statusCode === 401 || error?.statusCode === 400) {
-        await getAccessToken().then(([response, error]) => {
-          console.log(response, error);
-          if (!error) {
-            sessionStorage.setItem("accessToken", response?.access_token ?? "");
-            fetchQueue(response?.access_token ?? null);
-          }
-        });
-      }
+  const fetchQueue = useCallback(async () => {
+    const [response, error] = await getQueue({ useCache: false });
+    console.log(response, error);
 
-      if (JSON.stringify(response) !== JSON.stringify(prevQueueRef.current)) {
-        console.log(response);
-        if (response?.queue.length && response?.queue.length < 0) {
-          fetchQueue(sessionStorage.getItem("accessToken") ?? null, false);
-        }
-        setQueue(response);
-        prevQueueRef.current = response;
+    if (JSON.stringify(response) !== JSON.stringify(prevQueueRef.current)) {
+      console.log(response);
+      if (response?.queue.length && response?.queue.length < 0) {
+        fetchQueue();
       }
-    },
-    [setQueue],
-  );
+      setQueue(response);
+      prevQueueRef.current = response;
+    }
+  }, [setQueue]);
 
   useEffect(() => {
-    fetchQueue(sessionStorage.getItem("accessToken") ?? null);
+    fetchQueue();
   }, [fetchQueue]);
 
   useEffect(() => {
     if (app.refreshQueue) {
-      fetchQueue(sessionStorage.getItem("accessToken") ?? null);
+      fetchQueue();
       setRefreshQueue(false);
     }
   }, [app, app.refreshQueue, fetchQueue, setRefreshQueue]);
 
   useEffect(() => {
     const interval = setInterval(() => {
-      fetchQueue(sessionStorage.getItem("accessToken") ?? null);
+      fetchQueue();
     }, 30000);
     return () => clearInterval(interval);
   }, [fetchQueue]);
