@@ -49,6 +49,5 @@ export const addToQueue = async ({
     query: {
       uri,
     },
-    revalidateKey: "music-queue",
   });
 };

@@ -133,15 +133,7 @@ async function fetchAPI<URL extends API_PATH>({
     }
 
     // Attempt to parse the response as JSON
-    let data: DataHelperResponse<URL> | null = null;
-    const contentType = response.headers.get("Content-Type");
-
-    if (contentType && contentType.includes("application/json")) {
-      data = (await response.json()) as DataHelperResponse<URL>;
-    } else {
-      data = await response.text();
-    }
-
+    const data = (await response.json()) as DataHelperResponse<URL>;
     const endTime = Date.now();
     const duration = endTime - startTime;
     console.info(` API : ${method} ${fullUrl} - ${duration}ms`);
