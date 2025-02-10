@@ -4,7 +4,7 @@ import { post } from "@/data/helper";
 import { CustomDataResponse } from "@/data/helper";
 import { getRedisClient } from "@/server/redis";
 
-export const getAccessToken = async (): Promise<
+const generateAccessToken = async (): Promise<
   CustomDataResponse<"post:api/token">
 > => {
   const [response, error]: CustomDataResponse<"post:api/token"> = await post({
@@ -32,4 +32,14 @@ export const getAccessToken = async (): Promise<
   }
 
   return [response, error];
+};
+
+export const getAccessToken = async (): Promise<string | null> => {
+  let accessToken = await (await getRedisClient()).get("accessToken");
+  if (!accessToken) {
+    const [response, error] = await generateAccessToken();
+    if (error) console.log("error", error);
+    accessToken = response?.access_token ?? null;
+  }
+  return accessToken;
 };

@@ -7,9 +7,15 @@ import { getRedisClient } from "@/server/redis";
 export const SearchSpotify = async ({ query }: { query: string }) => {
   let accessToken = await (await getRedisClient()).get("accessToken");
   if (!accessToken) {
-    const [response, error] = await getAccessToken();
-    if (error) console.log("error", error);
-    accessToken = response?.access_token ?? null;
+    const response = await getAccessToken();
+    if (response) {
+      await (
+        await getRedisClient()
+      ).set("accessToken", response, {
+        EX: 3600,
+      });
+    }
+    accessToken = response ?? null;
   }
   return DataRequest({
     url: "get:search",
