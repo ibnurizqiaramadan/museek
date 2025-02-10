@@ -15,11 +15,12 @@ export default function Queue() {
 
     if (JSON.stringify(response) !== JSON.stringify(prevQueueRef.current)) {
       console.log(response);
-      if (response?.queue.length && response?.queue.length < 0) {
+      if (response?.queue.length && response?.queue.length > 0) {
+        setQueue(response);
+        prevQueueRef.current = response;
+      } else {
         fetchQueue();
       }
-      setQueue(response);
-      prevQueueRef.current = response;
     }
   }, [setQueue]);
 
