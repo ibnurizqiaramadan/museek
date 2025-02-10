@@ -1,13 +1,10 @@
 "use server";
 
-import { DataRequest, CustomDataResponse } from "@/data/helper";
+import { DataRequest } from "@/data/helper";
 import { getAccessToken } from "@/data/layer/auth";
 import { getRedisClient } from "@/server/redis";
-export const SearchSpotify = async ({
-  query,
-}: {
-  query: string;
-}): Promise<CustomDataResponse<"get:search">> => {
+
+export const SearchSpotify = async ({ query }: { query: string }) => {
   let accessToken = await (await getRedisClient()).get("accessToken");
   if (!accessToken) {
     const [response, error] = await getAccessToken();

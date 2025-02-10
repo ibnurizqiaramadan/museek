@@ -1,6 +1,6 @@
 "use server";
 
-import { DataRequest, CustomDataResponse } from "@/data/helper";
+import { DataRequest } from "@/data/helper";
 import { getRedisClient } from "@/server/redis";
 import { getAccessToken } from "@/data/layer/auth";
 
@@ -15,11 +15,7 @@ async function getSpotifyAccessToken(): Promise<string | null> {
   return accessToken;
 }
 
-export const getQueue = async ({
-  useCache = true,
-}: {
-  useCache?: boolean;
-}): Promise<CustomDataResponse<"get:me/player/queue">> => {
+export const getQueue = async ({ useCache = true }: { useCache?: boolean }) => {
   const accessToken = await getSpotifyAccessToken();
   return DataRequest({
     url: "get:me/player/queue",
@@ -35,9 +31,7 @@ export const getQueue = async ({
   });
 };
 
-export const getDevices = async (): Promise<
-  CustomDataResponse<"get:me/player/devices">
-> => {
+export const getDevices = async () => {
   const accessToken = await getSpotifyAccessToken();
   return DataRequest({
     url: "get:me/player/devices",
@@ -48,11 +42,7 @@ export const getDevices = async (): Promise<
   });
 };
 
-export const addToQueue = async ({
-  uri,
-}: {
-  uri: string;
-}): Promise<CustomDataResponse<"post:me/player/queue">> => {
+export const addToQueue = async ({ uri }: { uri: string }) => {
   const accessToken = await getSpotifyAccessToken();
   return DataRequest({
     url: "post:me/player/queue",
