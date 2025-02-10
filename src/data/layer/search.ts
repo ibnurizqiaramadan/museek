@@ -18,7 +18,7 @@ export const SearchSpotify = async ({ query }: { query: string }) => {
     accessToken = response ?? null;
   }
   return DataRequest({
-    url: "get:search",
+    url: "v1:get:search",
     headers: {
       Authorization: `Bearer ${accessToken}`,
     },

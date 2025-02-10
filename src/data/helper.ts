@@ -6,18 +6,23 @@ import { unstable_cache, revalidateTag } from "next/cache";
 
 /**
  * Represents the available API paths.
- * @typedef {keyof ReturnType<typeof getAPIPathMap>} API_PATH
+ * @typedef {`${API_VERSION}:${API_PATH_FOR_VERSION<API_VERSION>}`} API_PATH
  */
-type API_PATH = keyof ReturnType<typeof getAPIPathMap>;
+type API_VERSION = keyof ReturnType<typeof getAPIPathMap>;
+type API_PATH_FOR_VERSION<V extends API_VERSION> = keyof ReturnType<
+  typeof getAPIPathMap
+>[V];
+type API_PATH = `${API_VERSION}:${API_PATH_FOR_VERSION<API_VERSION>}`;
 
 /**
  * Represents the response type for a given API path.
- * @template S
- * @typedef {ReturnType<typeof getAPIPathMap>[S]['response']} DataHelperResponse
+ * @template S The API path string literal type
  */
 type DataHelperResponse<S extends API_PATH> = ReturnType<
   typeof getAPIPathMap
->[S]["response"];
+>[S extends `${infer V}:${string}` ? V : never][S extends `${string}:${infer P}`
+  ? P
+  : never]["response"];
 
 type FetchMethods =
   | "GET"
@@ -43,7 +48,7 @@ type FetchMethods =
  * @property {number} [revalidateTime=60] - The revalidate time for the request.
  * @property {(data: DataHelperResponse<URL> | null) => void} [cacheFn] - The cache function for the request.
  */
-interface RequestOptions<URL extends API_PATH = API_PATH> {
+interface RequestOptions<URL extends API_PATH> {
   url: URL;
   method?: FetchMethods;
   body?: Record<string, string>;
@@ -59,8 +64,7 @@ interface RequestOptions<URL extends API_PATH = API_PATH> {
 
 /**
  * Custom data response type.
- * @template T
- * @typedef {Array<DataHelperResponse<T> | null, CustomError | null>} CustomDataResponse
+ * @template T The API path type
  */
 export type CustomDataResponse<T extends API_PATH> = [
   DataHelperResponse<T> | null,
@@ -80,12 +84,14 @@ async function fetchAPI<URL extends API_PATH>({
   params = {},
   body = {},
 }: RequestOptions<URL>): Promise<CustomDataResponse<URL>> {
-  const API_PATH_MAP = getAPIPathMap();
-  const version = API_PATH_MAP[url].version;
+  // Split into version and the rest (method:path)
+  console.log("url", url);
 
   try {
-    const method = url.split(":")[0];
-    const apiPath = url.split(":")[1];
+    // Find the first colon to separate method and path
+    const version = url.split(":")[0];
+    const method = url.split(":")[1];
+    const apiPath = url.split(":").slice(2).join("");
     const parsedUrl = apiPath.replace(/:(\w+)/g, (_, param) => params[param]);
     const apiUrl = process.env[`SPOTIFY_API_BASE_URL_${version.toUpperCase()}`];
     const queryString = new URLSearchParams(query).toString();

@@ -6,7 +6,7 @@ import { getAccessToken } from "@/data/layer/auth";
 export const getQueue = async () => {
   const accessToken = await getAccessToken();
   return DataRequest({
-    url: "get:me/player/queue",
+    url: "v1:get:me/player/queue",
     headers: {
       Authorization: `Bearer ${accessToken}`,
     },
@@ -20,7 +20,7 @@ export const getQueue = async () => {
 export const getDevices = async () => {
   const accessToken = await getAccessToken();
   return DataRequest({
-    url: "get:me/player/devices",
+    url: "v1:get:me/player/devices",
     headers: {
       Authorization: `Bearer ${accessToken}`,
     },
@@ -30,7 +30,7 @@ export const getDevices = async () => {
 export const addToQueue = async ({ uri }: { uri: string }) => {
   const accessToken = await getAccessToken();
   return DataRequest({
-    url: "post:me/player/queue",
+    url: "v1:post:me/player/queue",
     headers: {
       Authorization: `Bearer ${accessToken}`,
     },

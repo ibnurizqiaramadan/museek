@@ -6,15 +6,15 @@ import { useState, useCallback } from "react";
 import { appStore } from "@/stores/AppStores";
 
 export default function Search() {
-  const { setSearch } = appStore((state) => state);
+  const { setSearch, setRefreshQueue } = appStore((state) => state);
   const [inputSearch, setInputSearch] = useState("");
 
   const fetchSearch = useCallback(async () => {
     const [response, error] = await SearchSpotify({ query: inputSearch });
     if (error) console.log("error", error);
     setSearch(response);
-    // setRefreshQueue(true);
-  }, [inputSearch, setSearch]);
+    setRefreshQueue(true);
+  }, [inputSearch, setRefreshQueue, setSearch]);
 
   return (
     <div className="flex items-center justify-center">
@@ -24,12 +24,12 @@ export default function Search() {
         placeholder="Search"
         onChange={(e) => {
           setInputSearch(e.target.value);
-          fetchSearch();
         }}
-        // onKeyDown={(e) => {
-        //   if (e.key === "Enter") {
-        //   }
-        // }}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") {
+            fetchSearch();
+          }
+        }}
       />
     </div>
   );

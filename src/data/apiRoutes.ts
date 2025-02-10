@@ -11,25 +11,22 @@ import {
  */
 export function getAPIPathMap() {
   return {
-    "get:me/player/queue": {
-      response: {} as QueueResponse,
-      version: "v1",
-    },
-    "post:me/player/queue": {
-      response: {} as string,
-      version: "v1",
-    },
-    "get:me/player/devices": {
-      response: {} as DeviceResponse,
-      version: "v1",
-    },
-    "post:api/token": {
-      response: {} as TokenResponse,
-      version: "v1",
-    },
-    "get:search": {
-      response: {} as SearchResponse,
-      version: "v1",
+    v1: {
+      "get:me/player/queue": {
+        response: {} as QueueResponse,
+      },
+      "post:me/player/queue": {
+        response: {} as string,
+      },
+      "get:me/player/devices": {
+        response: {} as DeviceResponse,
+      },
+      "post:api/token": {
+        response: {} as TokenResponse,
+      },
+      "get:search": {
+        response: {} as SearchResponse,
+      },
     },
   } as const;
 }

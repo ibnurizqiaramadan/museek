@@ -5,23 +5,25 @@ import { CustomDataResponse } from "@/data/helper";
 import { getRedisClient } from "@/server/redis";
 
 const generateAccessToken = async (): Promise<
-  CustomDataResponse<"post:api/token">
+  CustomDataResponse<"v1:post:api/token">
 > => {
-  const [response, error]: CustomDataResponse<"post:api/token"> = await post({
-    url: "post:api/token",
-    headers: {
-      "Content-Type": "application/x-www-form-urlencoded",
-      Authorization: `Basic ${Buffer.from(
-        `${process.env.SPOTIFY_CLIENT_ID}:${process.env.SPOTIFY_CLIENT_SECRET}`,
-      ).toString("base64")}`,
+  const [response, error]: CustomDataResponse<"v1:post:api/token"> = await post(
+    {
+      url: "v1:post:api/token",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+        Authorization: `Basic ${Buffer.from(
+          `${process.env.SPOTIFY_CLIENT_ID}:${process.env.SPOTIFY_CLIENT_SECRET}`,
+        ).toString("base64")}`,
+      },
+      body: {
+        grant_type: "refresh_token",
+        refresh_token: process.env.SPOTIFY_REFRESH_TOKEN,
+        client_id: process.env.SPOTIFY_CLIENT_ID,
+      },
+      useCache: false,
     },
-    body: {
-      grant_type: "refresh_token",
-      refresh_token: process.env.SPOTIFY_REFRESH_TOKEN,
-      client_id: process.env.SPOTIFY_CLIENT_ID,
-    },
-    useCache: false,
-  });
+  );
 
   if (response) {
     await (
