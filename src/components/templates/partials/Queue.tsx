@@ -41,7 +41,7 @@ export default function Queue() {
   }, [fetchQueue]);
 
   return (
-    <div className="flex flex-col bg-zinc-900 overflow-auto rounded-lg h-full w-1/2 min-w-[500px] p-2">
+    <div className="flex flex-col bg-zinc-900 overflow-auto rounded-lg h-full w-full p-2">
       <div className="overflow-y-auto max-h-[calc(100vh-186px)] max-w-[calc(100%)] overflow-hidden text-ellipsis whitespace-nowrap">
         {app?.queue?.queue?.length && app?.queue?.queue?.length > 0 && (
           <>

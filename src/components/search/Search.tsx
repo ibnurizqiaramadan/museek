@@ -17,10 +17,10 @@ export default function Search() {
   }, [inputSearch, setRefreshQueue, setSearch]);
 
   return (
-    <div className="flex items-center justify-center">
+    <div className="flex flex-grow items-center justify-center">
       <Input
         type="text"
-        className="rounded-lg w-2/6 p-0 m-0"
+        className="rounded-lg w-full md:w-1/2 lg:w-1/3 p-0 m-0"
         placeholder="Search"
         onChange={(e) => {
           setInputSearch(e.target.value);

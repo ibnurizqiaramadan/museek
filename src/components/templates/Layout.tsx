@@ -12,8 +12,12 @@ export default function Layout() {
       <div className="flex flex-col justify-center bg-zinc-950 rounded-lg h-full p-3 gap-3">
         <Search />
         <div className="flex flex-row gap-3 rounded-lg h-full">
-          <Sidebar />
-          <Queue />
+          <div className="hidden flex-grow sm:block md:w-1/2">
+            <Sidebar />
+          </div>
+          <div className="flex-grow sm:w-1/2 lg:w-1/4">
+            <Queue />
+          </div>
         </div>
         <Controls />
       </div>

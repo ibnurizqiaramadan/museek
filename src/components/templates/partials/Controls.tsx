@@ -5,7 +5,7 @@ import Image from "next/image";
 import { appStore } from "@/stores/AppStores";
 import { getNowPlaying } from "@/data/layer/player";
 import { useCallback, useEffect, useState } from "react";
-// import ListDevice from "@/components/controls/ListDevice";
+import ListDevice from "@/components/controls/ListDevice";
 
 const formatTime = (ms: number): string => {
   const totalSeconds = Math.floor(ms / 1000);
@@ -45,8 +45,22 @@ export default function Controls() {
   }, [fetchNowPlaying]);
 
   return (
-    <div className="flex flex-row justify-between items-center bg-zinc-900 rounded-lg max-h-[80px] flex-grow min-h-[80px] p-2">
-      <div className="flex flex-row items-center w-1/3">
+    <div className="flex flex-row justify-between items-center bg-zinc-900 rounded-lg max-h-[80px] flex-grow min-h-[80px] p-2 px-3">
+      <div
+        className="
+        hidden
+        flex-row 
+        items-center 
+        xl:flex
+        xl:w-1/3
+        lg:flex
+        lg:w-1/2
+        md:flex
+        md:w-1/2
+        sm:flex
+        sm:w-1/2
+        "
+      >
         {app?.nowPlaying?.item?.album?.images[0].url ? (
           <>
             <Image
@@ -75,7 +89,30 @@ export default function Controls() {
           </div>
         )}
       </div>
-      <div className="flex flex-col items-center justify-center gap-3 w-1/3 lg:absolute lg:left-1/2 lg:transform lg:-translate-x-1/2">
+      <div
+        className=" 
+          flex-col 
+          items-center 
+          justify-center
+          w-full
+          xl:w-1/3
+          xl:left-1/2
+          xl:absolute
+          xl:transform 
+          xl:-translate-x-1/2
+          xl:flex
+          lg:flex 
+          lg:right-0
+          lg:transform 
+          lg:w-1/2
+          md:flex 
+          md:gap-3 
+          md:w-1/2
+          sm:flex
+          sm:gap-3 
+          sm:w-1/2
+        "
+      >
         <div className="flex flex-row items-center justify-center gap-3">
           <Button size="sm">Previous</Button>
           <Button size="sm">Play</Button>
@@ -92,8 +129,8 @@ export default function Controls() {
           <p className="text-sm text-zinc-400">{formatTime(duration)}</p>
         </div>
       </div>
-      <div className="flex flex-row items-center justify-end w-1/3">
-        {/* <ListDevice /> */}
+      <div className="hidden flex-row items-center xl:flex justify-end w-1/3">
+        <ListDevice />
       </div>
     </div>
   );
