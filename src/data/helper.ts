@@ -46,7 +46,8 @@ type FetchMethods =
  * @property {string} [cacheKey] - The cache key for the request.
  * @property {string} [revalidateKey] - The revalidate key for the request.
  * @property {number} [revalidateTime=60] - The revalidate time for the request.
- * @property {(data: DataHelperResponse<URL> | null) => void} [cacheFn] - The cache function for the request.
+ * @property {(data: DataHelperResponse<URL> | null) => void} [response] - The response function for the request.
+ * @property {(time: number) => void} [responseTime] - The response time for the request.
  */
 interface RequestOptions<URL extends API_PATH> {
   url: URL;
@@ -60,15 +61,20 @@ interface RequestOptions<URL extends API_PATH> {
   revalidateKey?: string;
   revalidateTime?: number;
   response?: (data: DataHelperResponse<URL> | null) => void;
+  responseTime?: (time: number) => void;
 }
 
 /**
  * Custom data response type.
  * @template T The API path type
+ * @property {DataHelperResponse<T> | null} data - The response data.
+ * @property {CustomError | null} error - The error.
+ * @property {number | null} responseTime - The response time.
  */
 export type CustomDataResponse<T extends API_PATH> = [
   DataHelperResponse<T> | null,
   CustomError | null,
+  number | null,
 ];
 
 /**
@@ -137,6 +143,7 @@ async function fetchAPI<URL extends API_PATH>({
           statusCode: response.status,
           errors: parsedError,
         } as CustomError,
+        null,
       ];
     }
 
@@ -154,10 +161,10 @@ async function fetchAPI<URL extends API_PATH>({
     const duration = endTime - startTime;
     console.info(` API : ${method} ${fullUrl} - ${duration}ms`);
 
-    return [data, null];
+    return [data, null, duration];
   } catch (error) {
     console.log(error);
-    return [null, error as CustomError];
+    return [null, error as CustomError, null];
   }
 }
 
@@ -258,12 +265,18 @@ export const patch = async <URL extends API_PATH>(
  * @template URL
  * @param {Omit<RequestOptions, 'method'>} options - The options for the request.
  * @returns {Promise<CustomDataResponse<URL>>} The response data and error.
+ * @property {(data: DataHelperResponse<URL> | null) => void} [response] - The response function for the request.
+ * @property {(time: number) => void} [responseTime] - The response time for the request.
  */
 export const DataRequest = async <URL extends API_PATH>(
   options: Omit<RequestOptions<URL>, "method">,
 ): Promise<CustomDataResponse<URL>> => {
   const method = options.url.split(":")[0] as FetchMethods;
-  const [data, error] = await request<URL>({ ...options, method });
+  const [data, error, responseTime] = await request<URL>({
+    ...options,
+    method,
+  });
   if (options.response) options.response(data);
-  return [data, error];
+  if (options.responseTime) options.responseTime(responseTime ?? 0);
+  return [data, error, responseTime];
 };

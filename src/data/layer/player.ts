@@ -8,6 +8,7 @@ export const getNowPlaying = async () => {
   return DataRequest({
     url: "v1:get:me/player",
     headers: { Authorization: `Bearer ${accessToken}` },
+    responseTime: (time) => console.log("getNowPlaying", time, "ms"),
   });
 };
 
@@ -18,6 +19,7 @@ export const getQueue = async () => {
     headers: {
       Authorization: `Bearer ${accessToken}`,
     },
+    responseTime: (time) => console.log("getQueue", time, "ms"),
     revalidateTime: 180,
   });
 };
@@ -29,6 +31,7 @@ export const getDevices = async () => {
     headers: {
       Authorization: `Bearer ${accessToken}`,
     },
+    responseTime: (time) => console.log("getDevices", time, "ms"),
   });
 };
 

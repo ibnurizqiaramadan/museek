@@ -2,21 +2,9 @@
 
 import { DataRequest } from "@/data/helper";
 import { getAccessToken } from "@/data/layer/auth";
-import { getRedisClient } from "@/server/redis";
 
 export const SearchSpotify = async ({ query }: { query: string }) => {
-  let accessToken = await (await getRedisClient()).get("accessToken");
-  if (!accessToken) {
-    const response = await getAccessToken();
-    if (response) {
-      await (
-        await getRedisClient()
-      ).set("accessToken", response, {
-        EX: 3600,
-      });
-    }
-    accessToken = response ?? null;
-  }
+  const accessToken = await getAccessToken();
   return DataRequest({
     url: "v1:get:search",
     headers: {
@@ -29,5 +17,6 @@ export const SearchSpotify = async ({ query }: { query: string }) => {
     },
     useCache: true,
     revalidateTime: 180,
+    responseTime: (time) => console.log("SearchSpotify", time, "ms"),
   });
 };

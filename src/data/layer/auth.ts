@@ -33,7 +33,7 @@ const generateAccessToken = async (): Promise<
     });
   }
 
-  return [response, error];
+  return [response, error, null];
 };
 
 export const getAccessToken = async (): Promise<string | null> => {
