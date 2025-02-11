@@ -12,9 +12,7 @@ export default function Queue() {
   const fetchQueue = useCallback(async () => {
     const [response, error] = await getQueue();
     console.log(response, error);
-
     if (JSON.stringify(response) !== JSON.stringify(prevQueueRef.current)) {
-      console.log(response);
       if (response?.queue.length && response?.queue.length > 0) {
         setQueue(response);
         prevQueueRef.current = response;

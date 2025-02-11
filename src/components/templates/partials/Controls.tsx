@@ -15,7 +15,7 @@ const formatTime = (ms: number): string => {
 };
 
 export default function Controls() {
-  const { app, setNowPlaying } = appStore((state) => state);
+  const { app, setNowPlaying, setRefreshQueue } = appStore((state) => state);
   const [progress, setProgress] = useState(0);
   const [duration, setDuration] = useState(0);
   const fetchNowPlaying = useCallback(async () => {
@@ -34,10 +34,11 @@ export default function Controls() {
       if (progress >= duration) {
         setProgress(0);
         fetchNowPlaying();
+        setRefreshQueue(true);
       }
     }, 1000);
     return () => clearInterval(interval);
-  }, [progress, duration, fetchNowPlaying]);
+  }, [progress, duration, fetchNowPlaying, setRefreshQueue]);
 
   useEffect(() => {
     fetchNowPlaying();

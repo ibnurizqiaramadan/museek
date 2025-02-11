@@ -29,7 +29,7 @@ const generateAccessToken = async (): Promise<
     await (
       await getRedisClient()
     ).set("accessToken", response.access_token, {
-      EX: 3600,
+      EX: 1800, // 30 minutes
     });
   }
 
