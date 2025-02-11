@@ -105,3 +105,26 @@ export type Device = {
 export type DeviceResponse = {
   devices: Device[];
 };
+
+export type SpotifyNowPlaying = {
+  device: Device;
+  shuffle_state: boolean;
+  smart_shuffle: boolean;
+  repeat_state: string;
+  timestamp: number;
+  context: {
+    external_urls: SpotifyUrl;
+    href: string;
+    type: string;
+    uri: string;
+  };
+  progress_ms: number;
+  item: Track;
+  currently_playing_type: string;
+  actions: {
+    disallows: {
+      pausing: boolean;
+    };
+  };
+  is_playing: boolean;
+};

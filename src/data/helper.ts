@@ -59,7 +59,7 @@ interface RequestOptions<URL extends API_PATH> {
   cacheKey?: string;
   revalidateKey?: string;
   revalidateTime?: number;
-  cacheFn?: (data: DataHelperResponse<URL> | null) => void;
+  response?: (data: DataHelperResponse<URL> | null) => void;
 }
 
 /**
@@ -156,7 +156,7 @@ async function fetchAPI<URL extends API_PATH>({
 
     return [data, null];
   } catch (error) {
-    console.error(error);
+    console.log(error);
     return [null, error as CustomError];
   }
 }
@@ -264,6 +264,6 @@ export const DataRequest = async <URL extends API_PATH>(
 ): Promise<CustomDataResponse<URL>> => {
   const method = options.url.split(":")[0] as FetchMethods;
   const [data, error] = await request<URL>({ ...options, method });
-  if (options.cacheFn) options.cacheFn(data);
+  if (options.response) options.response(data);
   return [data, error];
 };

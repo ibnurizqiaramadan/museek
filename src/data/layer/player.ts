@@ -3,6 +3,14 @@
 import { DataRequest } from "@/data/helper";
 import { getAccessToken } from "@/data/layer/auth";
 
+export const getNowPlaying = async () => {
+  const accessToken = await getAccessToken();
+  return DataRequest({
+    url: "v1:get:me/player",
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
+};
+
 export const getQueue = async () => {
   const accessToken = await getAccessToken();
   return DataRequest({
@@ -11,9 +19,6 @@ export const getQueue = async () => {
       Authorization: `Bearer ${accessToken}`,
     },
     revalidateTime: 180,
-    cacheFn: (data) => {
-      console.log(data);
-    },
   });
 };
 

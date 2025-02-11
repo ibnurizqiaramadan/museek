@@ -1,8 +1,8 @@
 import {
-  Track,
   SearchResponse,
   QueueResponse,
   DeviceResponse,
+  SpotifyNowPlaying,
 } from "@/data/responseTypes";
 
 export type AppStore = {
@@ -12,10 +12,11 @@ export type AppStore = {
     refreshQueue: boolean;
     devices: DeviceResponse | null;
     selectedDevice: string | null;
+    nowPlaying: SpotifyNowPlaying | null;
   };
   setSearch: (search: SearchResponse | null) => void;
   setQueue: (queue: QueueResponse | null) => void;
-  setCurrentlyPlaying: (currentlyPlaying: Track | null) => void;
+  setNowPlaying: (nowPlaying: SpotifyNowPlaying | null) => void;
   setSearchResults: (searchResults: SearchResponse | null) => void;
   setRefreshQueue: (refreshQueue: boolean) => void;
   setDevices: (devices: DeviceResponse | null) => void;

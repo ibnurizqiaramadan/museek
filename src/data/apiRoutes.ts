@@ -3,6 +3,7 @@ import {
   SearchResponse,
   TokenResponse,
   DeviceResponse,
+  SpotifyNowPlaying,
 } from "./responseTypes";
 
 /**
@@ -12,6 +13,9 @@ import {
 export function getAPIPathMap() {
   return {
     v1: {
+      "get:me/player": {
+        response: {} as SpotifyNowPlaying,
+      },
       "get:me/player/queue": {
         response: {} as QueueResponse,
       },

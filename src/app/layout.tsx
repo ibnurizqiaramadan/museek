@@ -13,8 +13,16 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Spotify Controller",
-  description: "Spotify Controller",
+  ...(process.env.NODE_ENV === "development"
+    ? {
+        title: "Spotify Controller - Development Mode",
+        description:
+          "The website is running in development mode, some features may not work as expected, and expected features may not be available or getting errors and unstable.",
+      }
+    : {
+        title: "Spotify Controller",
+        description: "a request a hehe :D",
+      }),
 };
 
 export default function RootLayout({
