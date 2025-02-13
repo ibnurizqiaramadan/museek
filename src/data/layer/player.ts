@@ -20,6 +20,8 @@ export const getQueue = async () => {
       Authorization: `Bearer ${accessToken}`,
     },
     responseTime: (time) => console.log("getQueue", time, "ms"),
+    useCache: false,
+    cacheKey: "music-queue",
     revalidateTime: 180,
   });
 };
@@ -45,5 +47,6 @@ export const addToQueue = async ({ uri }: { uri: string }) => {
     query: {
       uri,
     },
+    revalidateKey: "music-queue",
   });
 };

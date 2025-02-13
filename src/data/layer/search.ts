@@ -16,7 +16,7 @@ export const SearchSpotify = async ({ query }: { query: string }) => {
       market: "ID",
     },
     useCache: true,
-    revalidateTime: 180,
+    revalidateTime: 86400,
     responseTime: (time) => console.log("SearchSpotify", time, "ms"),
   });
 };

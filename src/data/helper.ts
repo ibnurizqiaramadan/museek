@@ -180,13 +180,13 @@ async function request<URL extends API_PATH>(
     revalidateKey = "",
     revalidateTime = 60,
   } = options;
-  console.log("options", options);
   if (revalidateKey !== "") revalidateTag(revalidateKey);
   if (useCache && method === "get") {
     const key =
       cacheKey === ""
         ? `${options.url}-${JSON.stringify(options.query || {})}`
         : cacheKey;
+
     return unstable_cache(
       () => {
         console.log("key", key);
@@ -265,6 +265,10 @@ export const patch = async <URL extends API_PATH>(
  * @returns {Promise<CustomDataResponse<URL>>} The response data and error.
  * @property {(data: DataHelperResponse<URL> | null) => void} [response] - The response function for the request.
  * @property {(time: number) => void} [responseTime] - The response time for the request.
+ * @property {boolean} [useCache=false] - Whether to use caching.
+ * @property {string} [cacheKey] - The cache key for the request.
+ * @property {string} [revalidateKey] - The revalidate key for the request.
+ * @property {number} [revalidateTime=60] - The revalidate time for the request in seconds.
  */
 export const DataRequest = async <URL extends API_PATH>(
   options: Omit<RequestOptions<URL>, "method">,
