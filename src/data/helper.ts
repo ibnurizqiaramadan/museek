@@ -90,11 +90,7 @@ async function fetchAPI<URL extends API_PATH>({
   params = {},
   body = {},
 }: RequestOptions<URL>): Promise<CustomDataResponse<URL>> {
-  // Split into version and the rest (method:path)
-  console.log("url", url);
-
   try {
-    // Find the first colon to separate method and path
     const version = url.split(":")[0];
     const method = url.split(":")[1];
     const apiPath = url.split(":").slice(2).join("");
@@ -184,6 +180,7 @@ async function request<URL extends API_PATH>(
     revalidateKey = "",
     revalidateTime = 60,
   } = options;
+  console.log("options", options);
   if (revalidateKey !== "") revalidateTag(revalidateKey);
   if (useCache && method === "get") {
     const key =
@@ -192,6 +189,7 @@ async function request<URL extends API_PATH>(
         : cacheKey;
     return unstable_cache(
       () => {
+        console.log("key", key);
         return fetchAPI<URL>(options);
       },
       [key],
@@ -271,7 +269,7 @@ export const patch = async <URL extends API_PATH>(
 export const DataRequest = async <URL extends API_PATH>(
   options: Omit<RequestOptions<URL>, "method">,
 ): Promise<CustomDataResponse<URL>> => {
-  const method = options.url.split(":")[0] as FetchMethods;
+  const method = options.url.split(":")[1] as FetchMethods;
   const [data, error, responseTime] = await request<URL>({
     ...options,
     method,
