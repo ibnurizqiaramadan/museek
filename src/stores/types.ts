@@ -8,6 +8,7 @@ import {
 export type AppStore = {
   app: {
     search: SearchResponse | null;
+    searchInput: string;
     queue: QueueResponse | null;
     refreshQueue: boolean;
     devices: DeviceResponse | null;
@@ -16,6 +17,7 @@ export type AppStore = {
     isSidebarVisible: boolean;
   };
   setSearch: (search: SearchResponse | null) => void;
+  setSearchInput: (searchInput: string) => void;
   setQueue: (queue: QueueResponse | null) => void;
   setNowPlaying: (nowPlaying: SpotifyNowPlaying | null) => void;
   setSearchResults: (searchResults: SearchResponse | null) => void;

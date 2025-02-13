@@ -24,7 +24,7 @@ export default function Layout() {
   }, [setIsSidebarVisible]);
 
   return (
-    <HeroUIProvider className="h-screen">
+    <HeroUIProvider className="h-dvh">
       <div className="flex flex-col justify-center bg-zinc-950 rounded-lg h-full p-3 gap-y-3">
         <Search />
         <div

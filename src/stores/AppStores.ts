@@ -4,6 +4,7 @@ import { create } from "zustand";
 export const appStore = create<AppStore>((set) => ({
   app: {
     search: null,
+    searchInput: "",
     queue: null,
     refreshQueue: false,
     devices: null,
@@ -12,6 +13,8 @@ export const appStore = create<AppStore>((set) => ({
     isSidebarVisible: false,
   },
   setSearch: (search) => set((state) => ({ app: { ...state.app, search } })),
+  setSearchInput: (searchInput) =>
+    set((state) => ({ app: { ...state.app, searchInput } })),
   setQueue: (queue) => set((state) => ({ app: { ...state.app, queue } })),
   setNowPlaying: (nowPlaying) =>
     set((state) => ({ app: { ...state.app, nowPlaying } })),
