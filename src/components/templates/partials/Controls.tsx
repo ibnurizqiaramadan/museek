@@ -4,7 +4,7 @@ import { Button, Progress } from "@heroui/react";
 import Image from "next/image";
 import { appStore } from "@/stores/AppStores";
 import { getNowPlaying } from "@/data/layer/player";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, useMemo } from "react";
 import ListDevice from "@/components/controls/ListDevice";
 
 const formatTime = (ms: number): string => {
@@ -18,6 +18,10 @@ export default function Controls() {
   const { app, setNowPlaying, setRefreshQueue } = appStore((state) => state);
   const [progress, setProgress] = useState(0);
   const [duration, setDuration] = useState(0);
+
+  const formattedProgress = useMemo(() => formatTime(progress), [progress]);
+  const formattedDuration = useMemo(() => formatTime(duration), [duration]);
+
   const fetchNowPlaying = useCallback(async () => {
     const [response, error] = await getNowPlaying();
     if (error) console.error(error);
@@ -26,7 +30,7 @@ export default function Controls() {
       setProgress(response.progress_ms);
       setDuration(response.item.duration_ms);
     }
-  }, [setNowPlaying, setProgress, setDuration]);
+  }, [setNowPlaying]);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -39,7 +43,7 @@ export default function Controls() {
   useEffect(() => {
     const interval = setInterval(() => {
       if (app.queue?.currently_playing == null) return;
-      setProgress(progress + 1000);
+      setProgress((prev) => prev + 1000);
       if (progress >= duration) {
         setProgress(0);
         fetchNowPlaying();
@@ -134,14 +138,14 @@ export default function Controls() {
           <Button size="sm">Next</Button>
         </div>
         <div className="flex w-full flex-row items-center justify-center gap-3">
-          <p className="text-sm text-zinc-400">{formatTime(progress)}</p>
+          <p className="text-sm text-zinc-400">{formattedProgress}</p>
           <Progress
-            aria-label="Progress"
+            aria-labelledby="progress-label"
             size="sm"
             value={progress}
             maxValue={duration}
           />
-          <p className="text-sm text-zinc-400">{formatTime(duration)}</p>
+          <p className="text-sm text-zinc-400">{formattedDuration}</p>
         </div>
       </div>
       <div className="hidden flex-row items-center xl:flex justify-end w-1/3">

@@ -6,16 +6,30 @@ import Controls from "@/components/templates/partials/Controls";
 import Search from "@/components/search/Search";
 import { HeroUIProvider } from "@heroui/react";
 import { appStore } from "@/stores/AppStores";
-
+import { useEffect } from "react";
 export default function Layout() {
-  const { app } = appStore((state) => state);
+  const { app, setIsSidebarVisible } = appStore((state) => state);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsSidebarVisible(!(window.innerWidth <= 768));
+      console.log(window.innerWidth);
+    };
+    window.addEventListener("load", handleResize);
+    window.addEventListener("resize", handleResize);
+    return () => {
+      window.removeEventListener("resize", handleResize);
+      window.removeEventListener("load", handleResize);
+    };
+  }, [setIsSidebarVisible]);
+
   return (
     <HeroUIProvider className="h-screen">
-      <div className="flex flex-col justify-center bg-zinc-950 rounded-lg h-full p-3 gap-3">
+      <div className="flex flex-col justify-center bg-zinc-950 rounded-lg h-full p-3 gap-y-3">
         <Search />
         <div
-          className={`flex flex-row ${
-            app.isSidebarVisible ? "gap-3" : ""
+          className={`flex flex-row gap-3 ${
+            app.isSidebarVisible ? "" : ""
           } rounded-lg h-full`}
         >
           <div
@@ -27,7 +41,14 @@ export default function Layout() {
           >
             <Sidebar />
           </div>
-          <div className="flex-grow w-full sm:w-1/2 md:w-1/2 lg:w-1/4">
+          <div
+            className={`flex-grow w-full sm:w-1/2 md:w-1/2 lg:w-1/4 ${
+              app.isSidebarVisible === false &&
+              (app.search?.tracks?.items.length ?? 0) > 0
+                ? "hidden"
+                : ""
+            }`}
+          >
             <Queue />
           </div>
         </div>

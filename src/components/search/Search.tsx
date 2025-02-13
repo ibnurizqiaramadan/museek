@@ -22,6 +22,7 @@ export default function Search() {
         className="rounded-lg w-full md:w-1/2 lg:w-1/3 p-0 m-0"
         placeholder="Search"
         onChange={(e) => {
+          if (e.target.value.length === 0) setSearch(null);
           setInputSearch(e.target.value);
         }}
         onKeyDown={(e) => {
