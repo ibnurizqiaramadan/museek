@@ -13,6 +13,7 @@ export type AppStore = {
     devices: DeviceResponse | null;
     selectedDevice: string | null;
     nowPlaying: SpotifyNowPlaying | null;
+    isSidebarVisible: boolean;
   };
   setSearch: (search: SearchResponse | null) => void;
   setQueue: (queue: QueueResponse | null) => void;
@@ -21,4 +22,5 @@ export type AppStore = {
   setRefreshQueue: (refreshQueue: boolean) => void;
   setDevices: (devices: DeviceResponse | null) => void;
   setSelectedDevice: (selectedDevice: string | null) => void;
+  setIsSidebarVisible: (isSidebarVisible: boolean) => void;
 };

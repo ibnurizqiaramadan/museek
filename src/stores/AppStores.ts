@@ -9,6 +9,7 @@ export const appStore = create<AppStore>((set) => ({
     devices: null,
     selectedDevice: null,
     nowPlaying: null,
+    isSidebarVisible: true,
   },
   setSearch: (search) => set((state) => ({ app: { ...state.app, search } })),
   setQueue: (queue) => set((state) => ({ app: { ...state.app, queue } })),
@@ -21,4 +22,6 @@ export const appStore = create<AppStore>((set) => ({
   setDevices: (devices) => set((state) => ({ app: { ...state.app, devices } })),
   setSelectedDevice: (selectedDevice) =>
     set((state) => ({ app: { ...state.app, selectedDevice } })),
+  setIsSidebarVisible: (isSidebarVisible) =>
+    set((state) => ({ app: { ...state.app, isSidebarVisible } })),
 }));

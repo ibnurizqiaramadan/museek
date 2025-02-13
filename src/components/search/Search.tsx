@@ -6,15 +6,14 @@ import { useState, useCallback } from "react";
 import { appStore } from "@/stores/AppStores";
 
 export default function Search() {
-  const { setSearch, setRefreshQueue } = appStore((state) => state);
+  const { setSearch } = appStore((state) => state);
   const [inputSearch, setInputSearch] = useState("");
 
   const fetchSearch = useCallback(async () => {
     const [response, error] = await SearchSpotify({ query: inputSearch });
     if (error) console.log("error", error);
     setSearch(response);
-    setRefreshQueue(true);
-  }, [inputSearch, setRefreshQueue, setSearch]);
+  }, [inputSearch, setSearch]);
 
   return (
     <div className="flex flex-grow items-center justify-center">

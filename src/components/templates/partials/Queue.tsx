@@ -12,13 +12,15 @@ export default function Queue() {
   const fetchQueue = useCallback(async () => {
     const [response, error] = await getQueue();
     console.log(response, error);
+    console.log("response", response?.currently_playing);
+    if (response?.currently_playing == null) return setQueue(null);
     if (JSON.stringify(response) !== JSON.stringify(prevQueueRef.current)) {
       if (response?.queue.length && response?.queue.length > 0) {
         setQueue(response);
         prevQueueRef.current = response;
-      } else {
-        fetchQueue();
+        return;
       }
+      fetchQueue();
     }
   }, [setQueue]);
 
@@ -41,7 +43,15 @@ export default function Queue() {
   }, [fetchQueue]);
 
   return (
-    <div className="flex flex-col bg-zinc-900 overflow-auto rounded-lg h-full w-full p-2">
+    // <div
+    //   className={`flex flex-col bg-zinc-900 overflow-auto rounded-lg h-full p-2 ${
+    //     (app.search?.tracks?.items.length ?? (0 > 0 && app.isSidebarVisible)) &&
+    //     "hidden"
+    //   }`}
+    // >
+    <div
+      className={`flex flex-col bg-zinc-900 overflow-auto rounded-lg h-full p-2`}
+    >
       <div className="overflow-y-auto max-h-[calc(100vh-186px)] max-w-[calc(100%)] overflow-hidden text-ellipsis whitespace-nowrap">
         {app?.queue?.queue?.length && app?.queue?.queue?.length > 0 && (
           <>

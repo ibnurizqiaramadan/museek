@@ -30,6 +30,15 @@ export default function Controls() {
 
   useEffect(() => {
     const interval = setInterval(() => {
+      if (app.queue?.currently_playing == null) return;
+      fetchNowPlaying();
+    }, 10000);
+    return () => clearInterval(interval);
+  }, [app.queue?.currently_playing, fetchNowPlaying]);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (app.queue?.currently_playing == null) return;
       setProgress(progress + 1000);
       if (progress >= duration) {
         setProgress(0);
@@ -38,7 +47,13 @@ export default function Controls() {
       }
     }, 1000);
     return () => clearInterval(interval);
-  }, [progress, duration, fetchNowPlaying, setRefreshQueue]);
+  }, [
+    progress,
+    duration,
+    fetchNowPlaying,
+    setRefreshQueue,
+    app.queue?.currently_playing,
+  ]);
 
   useEffect(() => {
     fetchNowPlaying();
