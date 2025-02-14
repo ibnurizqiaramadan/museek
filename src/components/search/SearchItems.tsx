@@ -30,7 +30,7 @@ const SearchItems = ({ item }: { item: Track }) => {
         });
       }}
     >
-      <div className="flex flex-row items-center">
+      <div className="flex flex-row items-center gap-2">
         <Image
           alt="Card background"
           className="object-cover rounded-xl w-[80px] h-[80px] p-2"
@@ -38,8 +38,10 @@ const SearchItems = ({ item }: { item: Track }) => {
           width={80}
           height={80}
         />
-        <div className="flex flex-col">
-          <h4 className="font-bold text-large">{item.name}</h4>
+        <div className="flex flex-col max-w-[calc(100%-80px)] overflow-hidden text-ellipsis">
+          <h4 className="font-bold text-large overflow-hidden whitespace-nowrap text-ellipsis">
+            {item.name}
+          </h4>
           <p className="">{item.artists[0].name}</p>
         </div>
       </div>

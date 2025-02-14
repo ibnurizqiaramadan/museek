@@ -11,6 +11,7 @@ export const appStore = create<AppStore>((set) => ({
     selectedDevice: null,
     nowPlaying: null,
     isSidebarVisible: false,
+    playlists: null,
   },
   setSearch: (search) => set((state) => ({ app: { ...state.app, search } })),
   setSearchInput: (searchInput) =>
@@ -27,4 +28,6 @@ export const appStore = create<AppStore>((set) => ({
     set((state) => ({ app: { ...state.app, selectedDevice } })),
   setIsSidebarVisible: (isSidebarVisible) =>
     set((state) => ({ app: { ...state.app, isSidebarVisible } })),
+  setPlaylists: (playlists) =>
+    set((state) => ({ app: { ...state.app, playlists } })),
 }));

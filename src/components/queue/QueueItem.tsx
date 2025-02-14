@@ -10,7 +10,7 @@ const QueueItem = ({
   currentPlaying?: boolean;
 }) => {
   return (
-    <div className="rounded-lg flex flex-row h-[80px] items-center hover:bg-zinc-800 transition-all duration-300 cursor-pointer">
+    <div className="rounded-lg flex flex-row h-[80px] items-center hover:bg-zinc-800 transition-all duration-300">
       <Image
         alt="Card background"
         className="object-cover rounded-xl w-[80px] h-[80px] min-w-[80px] min-h-[80px] p-2"

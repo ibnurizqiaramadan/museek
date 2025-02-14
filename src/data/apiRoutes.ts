@@ -4,6 +4,7 @@ import {
   TokenResponse,
   DeviceResponse,
   SpotifyNowPlaying,
+  SpotifyPlaylistResponse,
 } from "./responseTypes";
 
 /**
@@ -24,6 +25,9 @@ export function getAPIPathMap() {
       },
       "get:me/player/devices": {
         response: {} as DeviceResponse,
+      },
+      "get:me/playlists": {
+        response: {} as SpotifyPlaylistResponse,
       },
       "post:api/token": {
         response: {} as TokenResponse,

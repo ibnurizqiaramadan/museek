@@ -48,7 +48,7 @@ export default function Queue() {
         {app?.queue?.queue?.length && app?.queue?.queue?.length > 0 && (
           <>
             <div>
-              <h4 className="text-large font-bold px-2">Now Playing</h4>
+              <h4 className="text-large font-bold p-2">Now Playing</h4>
               {app?.queue?.currently_playing && (
                 <QueueItem
                   key={app.queue.currently_playing.id}
@@ -58,7 +58,7 @@ export default function Queue() {
               )}
             </div>
             <div>
-              <h4 className="text-large font-bold px-2">Next Queue</h4>
+              <h4 className="text-large font-bold p-2">Next Queue</h4>
               {app?.queue?.queue?.map((item, index) => (
                 <QueueItem key={index} item={item} />
               ))}

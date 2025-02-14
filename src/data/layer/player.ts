@@ -26,6 +26,20 @@ export const getQueue = async () => {
   });
 };
 
+export const getPlaylists = async () => {
+  const accessToken = await getAccessToken();
+  return DataRequest({
+    url: "v1:get:me/playlists",
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
+    params: {
+      limit: "100",
+    },
+    responseTime: (time) => console.log("getPlaylists", time, "ms"),
+  });
+};
+
 export const getDevices = async () => {
   const accessToken = await getAccessToken();
   return DataRequest({

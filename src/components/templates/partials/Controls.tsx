@@ -132,7 +132,7 @@ export default function Controls() {
           sm:w-1/2
         "
       >
-        <div className="flex flex-row items-center justify-center gap-3">
+        <div className="hidden flex-row items-center justify-center gap-3">
           <Button size="sm">Previous</Button>
           <Button size="sm">Play</Button>
           <Button size="sm">Next</Button>
