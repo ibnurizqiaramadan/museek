@@ -49,4 +49,14 @@ img {
   -khtml-user-drag: none;
   -moz-user-drag: none;
   -o-user-drag: none;
+  -ms-user-drag: none;
+  user-drag: none;
+}
+
+/* make image not selectable */
+img {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 }
