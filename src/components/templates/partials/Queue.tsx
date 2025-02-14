@@ -35,13 +35,6 @@ export default function Queue() {
     }
   }, [app, app.refreshQueue, fetchQueue, setRefreshQueue]);
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      fetchQueue();
-    }, 30000);
-    return () => clearInterval(interval);
-  }, [fetchQueue]);
-
   return (
     <div
       className={`flex flex-col bg-zinc-900 overflow-auto rounded-lg h-full p-2 ${
