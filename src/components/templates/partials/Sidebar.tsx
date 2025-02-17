@@ -30,7 +30,7 @@ const Sidebar = () => {
               </div>
             )}
         </div>
-        <div className="flex flex-col gap-2">
+        <div className="hidden flex-col gap-2">
           {app.playlists?.items.length && app.playlists?.items.length > 0 && (
             <>
               <h4 className="text-large font-bold pt-2 px-2">

@@ -3,7 +3,15 @@
 import { DataRequest } from "@/data/helper";
 import { getAccessToken } from "@/data/layer/auth";
 
-export const SearchSpotify = async ({ query }: { query: string }) => {
+export const SearchSpotify = async ({
+  query,
+  limit,
+  offset,
+}: {
+  query: string;
+  limit?: number;
+  offset?: number;
+}) => {
   const accessToken = await getAccessToken();
   return DataRequest({
     url: "v1:get:search",
@@ -14,6 +22,8 @@ export const SearchSpotify = async ({ query }: { query: string }) => {
       q: query,
       type: "track,album,artist,playlist",
       market: "ID",
+      limit: limit?.toString() || "10",
+      offset: offset?.toString() || "0",
     },
     useCache: true,
     revalidateTime: 86400,

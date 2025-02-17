@@ -11,7 +11,11 @@ export default function Search() {
 
   const fetchSearch = useCallback(
     async (query: string) => {
-      const [response, error] = await SearchSpotify({ query });
+      const [response, error] = await SearchSpotify({
+        query,
+        limit: 20,
+        offset: app.search?.tracks.items.length || 0,
+      });
       if (error) console.log("error", error);
       if (query.length > 1) {
         setSearch(response);
@@ -19,7 +23,7 @@ export default function Search() {
         setSearch(null);
       }
     },
-    [setSearch],
+    [app.search?.tracks.items.length, setSearch],
   );
 
   const debounceFetchSearch = (query: string) => {
