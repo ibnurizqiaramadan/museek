@@ -42,7 +42,9 @@ const SearchItems = ({ item }: { item: Track }) => {
           <h4 className="font-bold text-large overflow-hidden whitespace-nowrap text-ellipsis">
             {item.name}
           </h4>
-          <p className="">{item.artists[0].name}</p>
+          <p className="">
+            {item.artists.map((artist) => artist.name).join(", ")}
+          </p>
         </div>
       </div>
       <div className="flex flex-col items-end">
