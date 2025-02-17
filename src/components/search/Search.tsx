@@ -13,8 +13,6 @@ export default function Search() {
     async (query: string) => {
       const [response, error] = await SearchSpotify({
         query,
-        limit: 20,
-        offset: app.search?.tracks.items.length || 0,
       });
       if (error) console.log("error", error);
       if (query.length > 1) {
@@ -23,7 +21,7 @@ export default function Search() {
         setSearch(null);
       }
     },
-    [app.search?.tracks.items.length, setSearch],
+    [setSearch],
   );
 
   const debounceFetchSearch = (query: string) => {
