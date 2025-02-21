@@ -14,7 +14,13 @@ export const GetVideo = async (id: string) => {
   try {
     const cookies = path.join(os.tmpdir(), "music-guys", "cookies.txt");
     console.log(`https://www.youtube.com/watch?v=${id}`);
-    const file = `${os.tmpdir()}/music-guys/videos/${id}.mp3`;
+    const dir = path.join(os.tmpdir(), "music-guys", "videos");
+    const file = `${dir}/${id}.mp3`;
+
+    // Ensure the directory exists
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true });
+    }
 
     if (fs.existsSync(file)) {
       return file;
