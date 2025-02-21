@@ -1,16 +1,40 @@
+"use client";
+
 import { appStore } from "@/stores/AppStores";
 import { deleteFromQueue } from "@/data/model/queue.model";
+import { useEffect, useState } from "react";
 
 export default function ContextMenu() {
   const { app, setQueue, setContextMenu } = appStore((state) => state);
 
-  // Get window dimensions
-  const windowWidth = window.innerWidth;
-  const windowHeight = window.innerHeight;
+  // State to hold window dimensions
+  const [windowDimensions, setWindowDimensions] = useState({
+    width: 0,
+    height: 0,
+  });
+
+  useEffect(() => {
+    // Update dimensions on mount
+    setWindowDimensions({
+      width: window.innerWidth,
+      height: window.innerHeight,
+    });
+
+    // Optional: Update dimensions on resize
+    const handleResize = () => {
+      setWindowDimensions({
+        width: window.innerWidth,
+        height: window.innerHeight,
+      });
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   // Calculate adjusted positions
-  const adjustedX = Math.min(app.contextMenu.x, windowWidth - 200); // Assuming 200 is the width of the menu
-  const adjustedY = Math.min(app.contextMenu.y, windowHeight - 100); // Assuming 100 is the height of the menu
+  const adjustedX = Math.min(app.contextMenu.x, windowDimensions.width - 200); // Assuming 200 is the width of the menu
+  const adjustedY = Math.min(app.contextMenu.y, windowDimensions.height - 100); // Assuming 100 is the height of the menu
 
   return (
     <>
