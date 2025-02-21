@@ -16,13 +16,13 @@ export default function Layout() {
   useEffect(() => {
     const handleResize = () => {
       setIsSidebarVisible(!(window.innerWidth <= 768));
-      console.log(window.innerWidth);
     };
-    window.addEventListener("load", handleResize);
+
+    handleResize();
+
     window.addEventListener("resize", handleResize);
     return () => {
       window.removeEventListener("resize", handleResize);
-      window.removeEventListener("load", handleResize);
     };
   }, [setIsSidebarVisible]);
 
