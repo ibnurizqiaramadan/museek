@@ -1,6 +1,6 @@
 "use client";
 
-import { SearchSpotify } from "@/data/layer/search";
+import { SearchYoutube } from "@/data/layer/search";
 import { Input } from "@heroui/react";
 import { useCallback, useRef } from "react";
 import { appStore } from "@/stores/AppStores";
@@ -11,11 +11,12 @@ export default function Search() {
 
   const fetchSearch = useCallback(
     async (query: string) => {
-      const [response, error] = await SearchSpotify({
+      const [response, error] = await SearchYoutube({
         query,
       });
       if (error) console.log("error", error);
       if (query.length > 1) {
+        console.log("response", response);
         setSearch(response);
       } else {
         setSearch(null);

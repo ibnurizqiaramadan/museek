@@ -75,8 +75,35 @@ export type TracksResponse = {
   items: Track[];
 };
 
-export type SearchResponse = {
-  tracks: TracksResponse;
+export type YoutubeSearchResponse = {
+  status: number;
+  data: {
+    length: number;
+    items: {
+      id: {
+        videoId: string;
+      };
+      url: string;
+      title: string;
+      description: string;
+      duration_raw: string;
+      snippet: {
+        url: string;
+        duration: string;
+        publishedAt: string;
+        thumbnails: {
+          id: string;
+          url: string;
+          default: string;
+          high: string;
+          height: number;
+          width: number;
+        };
+        title: string;
+      };
+      views: number;
+    }[];
+  };
 };
 
 export type QueueResponse = {

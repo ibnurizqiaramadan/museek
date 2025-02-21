@@ -6,12 +6,8 @@ export const appStore = create<AppStore>((set) => ({
     search: null,
     searchInput: "",
     queue: null,
-    refreshQueue: false,
-    devices: null,
-    selectedDevice: null,
     nowPlaying: null,
     isSidebarVisible: false,
-    playlists: null,
   },
   setSearch: (search) => set((state) => ({ app: { ...state.app, search } })),
   setSearchInput: (searchInput) =>
@@ -19,15 +15,6 @@ export const appStore = create<AppStore>((set) => ({
   setQueue: (queue) => set((state) => ({ app: { ...state.app, queue } })),
   setNowPlaying: (nowPlaying) =>
     set((state) => ({ app: { ...state.app, nowPlaying } })),
-  setSearchResults: (searchResults) =>
-    set((state) => ({ app: { ...state.app, searchResults } })),
-  setRefreshQueue: (refreshQueue) =>
-    set((state) => ({ app: { ...state.app, refreshQueue } })),
-  setDevices: (devices) => set((state) => ({ app: { ...state.app, devices } })),
-  setSelectedDevice: (selectedDevice) =>
-    set((state) => ({ app: { ...state.app, selectedDevice } })),
   setIsSidebarVisible: (isSidebarVisible) =>
     set((state) => ({ app: { ...state.app, isSidebarVisible } })),
-  setPlaylists: (playlists) =>
-    set((state) => ({ app: { ...state.app, playlists } })),
 }));

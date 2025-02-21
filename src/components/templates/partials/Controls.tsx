@@ -3,9 +3,7 @@
 import { Button, Progress } from "@heroui/react";
 import Image from "next/image";
 import { appStore } from "@/stores/AppStores";
-import { getNowPlaying } from "@/data/layer/player";
-import { useCallback, useEffect, useState, useMemo } from "react";
-import ListDevice from "@/components/controls/ListDevice";
+import { useMemo, useState, useEffect, useRef } from "react";
 
 const formatTime = (ms: number): string => {
   const totalSeconds = Math.floor(ms / 1000);
@@ -15,53 +13,62 @@ const formatTime = (ms: number): string => {
 };
 
 export default function Controls() {
-  const { app, setNowPlaying, setRefreshQueue } = appStore((state) => state);
+  const { app, setNowPlaying } = appStore((state) => state);
   const [progress, setProgress] = useState(0);
   const [duration, setDuration] = useState(0);
+  const audioRef = useRef<HTMLAudioElement>(null);
 
   const formattedProgress = useMemo(() => formatTime(progress), [progress]);
   const formattedDuration = useMemo(() => formatTime(duration), [duration]);
 
-  const fetchNowPlaying = useCallback(async () => {
-    const [response, error] = await getNowPlaying();
-    if (error) console.error(error);
-    if (response) {
-      setNowPlaying(response);
-      setProgress(response.progress_ms);
-      setDuration(response.item.duration_ms);
-    }
-  }, [setNowPlaying]);
-
   useEffect(() => {
-    const interval = setInterval(() => {
-      if (app.queue?.currently_playing == null) return;
-      fetchNowPlaying();
-    }, 10000);
-    return () => clearInterval(interval);
-  }, [app.queue?.currently_playing, fetchNowPlaying]);
+    console.log(app.nowPlaying);
+  }, [app.nowPlaying]);
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      if (app.queue?.currently_playing == null) return;
-      setProgress((prev) => prev + 1000);
-      if (progress >= duration) {
-        setProgress(0);
-        fetchNowPlaying();
-        setRefreshQueue(true);
+  const handleTimeUpdate = () => {
+    if (audioRef.current) {
+      setProgress(audioRef.current.currentTime * 1000);
+      if (audioRef.current.currentTime >= audioRef.current.duration) {
+        const currentIndex = app.queue?.findIndex(
+          (item) => item.videoId === app.nowPlaying?.videoId,
+        );
+        const nextIndex =
+          currentIndex !== undefined && currentIndex >= 0
+            ? currentIndex + 1
+            : 0;
+
+        // Check if the next index is within bounds
+        if (app.queue && nextIndex < app.queue.length) {
+          setNowPlaying(app.queue[nextIndex]);
+        } else {
+          // If the end of the queue is reached, go back to the first item
+          setNowPlaying(app.queue?.[0] || null);
+        }
       }
-    }, 1000);
-    return () => clearInterval(interval);
-  }, [
-    progress,
-    duration,
-    fetchNowPlaying,
-    setRefreshQueue,
-    app.queue?.currently_playing,
-  ]);
+    }
+  };
 
-  useEffect(() => {
-    fetchNowPlaying();
-  }, [fetchNowPlaying]);
+  const handleLoadedMetadata = () => {
+    if (audioRef.current) {
+      setDuration(audioRef.current.duration * 1000);
+    }
+  };
+
+  const handleSeek = (event: React.MouseEvent<HTMLDivElement>) => {
+    const progressBar = event.currentTarget;
+    const clickPosition =
+      event.clientX - progressBar.getBoundingClientRect().left;
+    const newTime = (clickPosition / progressBar.clientWidth) * duration; // Calculate new time in seconds
+    if (audioRef.current) {
+      audioRef.current.currentTime = newTime / 1000; // Set the audio current time in seconds
+      setProgress(newTime); // Update progress state
+    }
+  };
+
+  const handlePlay = () => {
+    console.log("Audio is now playing");
+    // You can add more actions here if needed
+  };
 
   return (
     <div className="flex flex-row justify-between items-center bg-zinc-900 rounded-lg max-h-[80px] flex-grow min-h-[80px] p-2 px-3">
@@ -80,11 +87,11 @@ export default function Controls() {
         sm:w-1/2
         "
       >
-        {app?.nowPlaying?.item?.album?.images[0].url ? (
+        {app?.nowPlaying?.snippet?.thumbnails?.url ? (
           <>
             <Image
               className="rounded-lg"
-              src={app.nowPlaying.item.album.images[0].url}
+              src={app.nowPlaying.snippet.thumbnails.url}
               alt="Spotify"
               width={60}
               height={60}
@@ -93,12 +100,10 @@ export default function Controls() {
               <h4
                 className={`font-bold text-large overflow-hidden whitespace-nowrap text-ellipsis px-1`}
               >
-                {app.nowPlaying.item.name}
+                {app.nowPlaying.title}
               </h4>
               <p className="text-sm text-zinc-400 overflow-hidden whitespace-nowrap text-ellipsis px-1">
-                {app.nowPlaying.item.artists
-                  .map((artist) => artist.name)
-                  .join(", ")}
+                {app.nowPlaying.snippet.publishedAt}
               </p>
             </div>
           </>
@@ -139,17 +144,27 @@ export default function Controls() {
         </div>
         <div className="flex w-full flex-row items-center justify-center gap-3">
           <p className="text-sm text-zinc-400">{formattedProgress}</p>
-          <Progress
-            aria-labelledby="progress-label"
-            size="sm"
-            value={progress}
-            maxValue={duration}
+          <div onClick={handleSeek} style={{ width: "100%" }}>
+            <Progress
+              aria-labelledby="progress-label"
+              size="md"
+              value={progress}
+              maxValue={duration}
+              className="cursor-pointer"
+            />
+          </div>
+          <audio
+            ref={audioRef}
+            src={`/api/v1/youtube/stream/${app.nowPlaying?.videoId}`}
+            controls
+            autoPlay
+            hidden
+            onTimeUpdate={handleTimeUpdate}
+            onLoadedMetadata={handleLoadedMetadata}
+            onPlay={handlePlay}
           />
           <p className="text-sm text-zinc-400">{formattedDuration}</p>
         </div>
-      </div>
-      <div className="hidden flex-row items-center xl:flex justify-end w-1/3">
-        <ListDevice />
       </div>
     </div>
   );

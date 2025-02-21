@@ -8,9 +8,13 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "i.scdn.co",
       },
+      {
+        protocol: "https",
+        hostname: "i.ytimg.com",
+      },
     ],
   },
-  serverExternalPackages: ["redis"],
+  serverExternalPackages: ["redis", "ytdl-core"],
 };
 
 export default nextConfig;

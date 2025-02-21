@@ -1,31 +1,17 @@
-import {
-  SearchResponse,
-  QueueResponse,
-  DeviceResponse,
-  SpotifyNowPlaying,
-  SpotifyPlaylistResponse,
-} from "@/data/responseTypes";
+import { YoutubeSearchResponse } from "@/data/responseTypes";
+import { QueueItemType } from "@/data/model/queue.model";
 
 export type AppStore = {
   app: {
-    search: SearchResponse | null;
+    search: YoutubeSearchResponse | null;
     searchInput: string;
-    queue: QueueResponse | null;
-    refreshQueue: boolean;
-    devices: DeviceResponse | null;
-    selectedDevice: string | null;
-    nowPlaying: SpotifyNowPlaying | null;
+    queue: QueueItemType[] | null;
+    nowPlaying: QueueItemType | null;
     isSidebarVisible: boolean;
-    playlists: SpotifyPlaylistResponse | null;
   };
-  setSearch: (search: SearchResponse | null) => void;
+  setSearch: (search: YoutubeSearchResponse | null) => void;
   setSearchInput: (searchInput: string) => void;
-  setQueue: (queue: QueueResponse | null) => void;
-  setNowPlaying: (nowPlaying: SpotifyNowPlaying | null) => void;
-  setSearchResults: (searchResults: SearchResponse | null) => void;
-  setRefreshQueue: (refreshQueue: boolean) => void;
-  setDevices: (devices: DeviceResponse | null) => void;
-  setSelectedDevice: (selectedDevice: string | null) => void;
+  setQueue: (queue: QueueItemType[] | null) => void;
+  setNowPlaying: (nowPlaying: QueueItemType | null) => void;
   setIsSidebarVisible: (isSidebarVisible: boolean) => void;
-  setPlaylists: (playlists: SpotifyPlaylistResponse | null) => void;
 };

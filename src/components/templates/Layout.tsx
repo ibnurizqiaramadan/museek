@@ -34,7 +34,7 @@ export default function Layout() {
         >
           <div
             className={`flex-grow md:block md:w-1/2 ${
-              (app.search?.tracks?.items.length ?? 0 > 0)
+              (app.search?.data.items.length ?? 0) > 0
                 ? "flex w-full"
                 : "hidden"
             }`}
@@ -44,7 +44,7 @@ export default function Layout() {
           <div
             className={`flex-grow w-full sm:w-1/2 md:w-1/2 lg:w-1/4 ${
               app.isSidebarVisible === false &&
-              (app.search?.tracks?.items.length ?? 0) > 0
+              (app.search?.data.items.length ?? 0) > 0
                 ? "hidden"
                 : ""
             }`}

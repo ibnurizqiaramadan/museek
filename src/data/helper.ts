@@ -3,6 +3,7 @@
 import { CustomError } from "@/data/responseTypes";
 import { getAPIPathMap } from "@/data/apiRoutes";
 import { unstable_cache, revalidateTag } from "next/cache";
+import { headers as nextHeaders } from "next/headers";
 
 /**
  * Represents the available API paths.
@@ -51,6 +52,7 @@ type FetchMethods =
  */
 interface RequestOptions<URL extends API_PATH> {
   url: URL;
+  origin?: string | null;
   method?: FetchMethods;
   body?: Record<string, string>;
   query?: Record<string, string>;
@@ -85,6 +87,7 @@ export type CustomDataResponse<T extends API_PATH> = [
  */
 async function fetchAPI<URL extends API_PATH>({
   url,
+  origin,
   headers = {},
   query = {},
   params = {},
@@ -95,19 +98,17 @@ async function fetchAPI<URL extends API_PATH>({
     const method = url.split(":")[1];
     const apiPath = url.split(":").slice(2).join("");
     const parsedUrl = apiPath.replace(/:(\w+)/g, (_, param) => params[param]);
-    const apiUrl = process.env[`SPOTIFY_API_BASE_URL_${version.toUpperCase()}`];
+    const apiUrl = `${origin}/api/${version}`;
     const queryString = new URLSearchParams(query).toString();
-    const fullUrl =
-      apiPath === "api/token"
-        ? `https://accounts.spotify.com/api/token`
-        : `${apiUrl}/${parsedUrl}?${queryString}`;
+    const fullUrl = `${apiUrl}/${parsedUrl}?${queryString}`;
+    console.log("fullUrl", fullUrl);
 
     const startTime = Date.now();
 
     const response = await fetch(fullUrl, {
       method,
       headers: {
-        "User-Agent": `spotify-bot-${process.env.NODE_ENV}`,
+        "User-Agent": `music-guys-fe-${process.env.NODE_ENV}`,
         ...headers,
       },
       ...(method.toLocaleLowerCase() !== "get" && {
@@ -173,7 +174,9 @@ async function fetchAPI<URL extends API_PATH>({
 async function request<URL extends API_PATH>(
   options: RequestOptions<URL>,
 ): Promise<CustomDataResponse<URL>> {
+  const headersList = await nextHeaders();
   const {
+    origin = headersList.get("origin"),
     method = "get",
     useCache = false,
     cacheKey = "",
@@ -190,7 +193,7 @@ async function request<URL extends API_PATH>(
     return unstable_cache(
       () => {
         console.log("key", key);
-        return fetchAPI<URL>(options);
+        return fetchAPI<URL>({ ...options, origin });
       },
       [key],
       {

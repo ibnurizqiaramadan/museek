@@ -1,6 +1,6 @@
 import {
   QueueResponse,
-  SearchResponse,
+  YoutubeSearchResponse,
   TokenResponse,
   DeviceResponse,
   SpotifyNowPlaying,
@@ -32,8 +32,8 @@ export function getAPIPathMap() {
       "post:api/token": {
         response: {} as TokenResponse,
       },
-      "get:search": {
-        response: {} as SearchResponse,
+      "get:youtube/search": {
+        response: {} as YoutubeSearchResponse,
       },
     },
   } as const;
