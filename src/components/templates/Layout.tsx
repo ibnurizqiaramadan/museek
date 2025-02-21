@@ -7,8 +7,11 @@ import Search from "@/components/search/Search";
 import { HeroUIProvider } from "@heroui/react";
 import { appStore } from "@/stores/AppStores";
 import { useEffect } from "react";
+import ContextMenu from "@/components/ContextMenu/ContextMenu";
 export default function Layout() {
-  const { app, setIsSidebarVisible } = appStore((state) => state);
+  const { app, setIsSidebarVisible, setContextMenu } = appStore(
+    (state) => state,
+  );
 
   useEffect(() => {
     const handleResize = () => {
@@ -25,7 +28,30 @@ export default function Layout() {
 
   return (
     <HeroUIProvider className="h-dvh select-none">
-      <div className="flex flex-col justify-center bg-zinc-950 rounded-lg h-full p-3 gap-y-3">
+      <div
+        className="flex flex-col justify-center bg-zinc-950 rounded-lg h-full p-3 gap-y-3"
+        onClick={(e) => {
+          setContextMenu({ id: null, visible: false, x: 0, y: 0 });
+          e.stopPropagation();
+          e.preventDefault();
+        }}
+      >
+        <ContextMenu />
+        <div
+          className={`absolute top-0 left-0 w-full h-full ${
+            app.contextMenu.visible ? "block" : "hidden"
+          }`}
+          onContextMenu={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            setContextMenu({
+              id: null,
+              visible: false,
+              x: 0,
+              y: 0,
+            });
+          }}
+        ></div>
         <Search />
         <div
           className={`flex flex-row gap-3 ${

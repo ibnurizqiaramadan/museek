@@ -27,6 +27,19 @@ export const addToQueue = async (item: QueueItemType) => {
   }
 };
 
+export const deleteFromQueue = async (id: string) => {
+  try {
+    await queue.delete(id);
+  } catch (error) {
+    console.error("Failed to delete item from queue:", error);
+  }
+};
+
 export const getQueue = async () => {
-  return await queue.toArray();
+  try {
+    return await queue.toArray();
+  } catch (error) {
+    console.error("Failed to get queue:", error);
+    return [];
+  }
 };

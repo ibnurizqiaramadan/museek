@@ -8,6 +8,12 @@ export const appStore = create<AppStore>((set) => ({
     queue: null,
     nowPlaying: null,
     isSidebarVisible: false,
+    contextMenu: {
+      id: null,
+      visible: false,
+      x: 0,
+      y: 0,
+    },
   },
   setSearch: (search) => set((state) => ({ app: { ...state.app, search } })),
   setSearchInput: (searchInput) =>
@@ -17,4 +23,6 @@ export const appStore = create<AppStore>((set) => ({
     set((state) => ({ app: { ...state.app, nowPlaying } })),
   setIsSidebarVisible: (isSidebarVisible) =>
     set((state) => ({ app: { ...state.app, isSidebarVisible } })),
+  setContextMenu: (contextMenu) =>
+    set((state) => ({ app: { ...state.app, contextMenu } })),
 }));

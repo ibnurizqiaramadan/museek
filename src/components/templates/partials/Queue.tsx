@@ -24,7 +24,7 @@ export default function Queue() {
           : ""
       }`}
     >
-      <div className="overflow-y-auto max-h-[calc(100dvh-186px)] max-w-[calc(100%)] overflow-hidden text-ellipsis whitespace-nowrap">
+      <div className="overflow-y-auto max-h-[calc(100dvh-196px)] max-w-[calc(100%)] overflow-hidden text-ellipsis whitespace-nowrap">
         <div
           className={`${app.queue?.length && app.queue?.length > 0 ? "" : "hidden"}`}
         >

@@ -13,7 +13,7 @@ const Sidebar = () => {
 
   return (
     <div className={`bg-zinc-900 rounded-lg h-full w-full p-2 `}>
-      <div className="overflow-y-auto max-h-[calc(100dvh-186px)]">
+      <div className="overflow-y-auto max-h-[calc(100dvh-196px)]">
         <div className="flex flex-col gap-2">
           {app?.search?.data.items.length &&
             app?.search?.data.items.length > 0 && (

@@ -4,12 +4,23 @@ import { Image } from "@heroui/react";
 import { QueueItemType } from "@/data/model/queue.model";
 import { appStore } from "@/stores/AppStores";
 const QueueItem = ({ item }: { item: QueueItemType }) => {
-  const { app, setNowPlaying } = appStore((state) => state);
+  const { app, setNowPlaying, setContextMenu } = appStore((state) => state);
   return (
     <div
       className="rounded-lg flex flex-row h-[80px] items-center hover:bg-zinc-800 transition-all duration-300 cursor-pointer"
-      onClick={() => {
+      data-id={item.id}
+      onClick={(e) => {
+        console.log(e.target);
         setNowPlaying(item);
+      }}
+      onContextMenu={(e) => {
+        e.preventDefault();
+        setContextMenu({
+          id: item.id,
+          visible: true,
+          x: e.pageX,
+          y: e.pageY,
+        });
       }}
     >
       <Image
