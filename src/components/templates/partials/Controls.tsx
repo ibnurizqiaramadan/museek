@@ -53,7 +53,9 @@ export default function Controls() {
     }
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const handleSeek = (event: React.MouseEvent<HTMLDivElement>) => {
+    event.preventDefault();
     const progressBar = event.currentTarget;
     const clickPosition =
       event.clientX - progressBar.getBoundingClientRect().left;
@@ -168,7 +170,7 @@ export default function Controls() {
           md:flex 
           md:gap-3 
           md:w-1/2
-          sm:flex
+          sm:flex 
           sm:gap-3 
           sm:w-1/2
         "
@@ -186,7 +188,7 @@ export default function Controls() {
         </div>
         <div className="flex w-full flex-row items-center justify-center gap-3">
           <p className="text-sm text-zinc-400">{formattedProgress}</p>
-          <div onClickCapture={handleSeek} style={{ width: "100%" }}>
+          <div style={{ width: "100%" }}>
             <Slider
               aria-labelledby="progress-label"
               size="sm"
@@ -198,7 +200,7 @@ export default function Controls() {
           {app.nowPlaying?.videoId && (
             <audio
               ref={audioRef}
-              src={`/api/v1/youtube/stream/${app.nowPlaying?.videoId}`}
+              src={`/api/v1/youtube/stream/no-seek/${app.nowPlaying?.videoId}`}
               controls
               autoPlay
               hidden

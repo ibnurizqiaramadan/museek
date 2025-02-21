@@ -12,7 +12,6 @@ export async function GET(request: NextRequest) {
   }
 
   const file = await GetVideo(url);
-  console.log("file", file);
 
   const stat = fs.statSync(file as string); // Get file stats
   const { size } = stat; // Get the size of the file
