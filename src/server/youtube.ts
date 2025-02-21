@@ -12,12 +12,7 @@ export const Search = async (query: string) => {
 
 export const GetVideo = async (id: string) => {
   try {
-    const cookies = path.join(
-      os.homedir(),
-      ".config",
-      "music-guys",
-      "cookies.txt",
-    );
+    const cookies = path.join(os.tmpdir(), "music-guys", "cookies.txt");
     console.log(`https://www.youtube.com/watch?v=${id}`);
     const file = `${os.tmpdir()}/music-guys/videos/${id}.mp3`;
 
