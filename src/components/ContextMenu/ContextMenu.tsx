@@ -3,6 +3,7 @@
 import { appStore } from "@/stores/AppStores";
 import { deleteFromQueue } from "@/data/model/queue.model";
 import { useEffect, useState } from "react";
+import { addToast } from "@heroui/toast";
 
 export default function ContextMenu() {
   const { app, setQueue, setContextMenu } = appStore((state) => state);
@@ -56,6 +57,14 @@ export default function ContextMenu() {
                 app.queue?.filter((item) => item.id !== app.contextMenu.id) ||
                   null,
               );
+              addToast({
+                title: "Deleted from queue",
+                description: app.queue?.find(
+                  (item) => item.id === app.contextMenu.id,
+                )?.title,
+                variant: "solid",
+                color: "success",
+              });
               setContextMenu({
                 id: null,
                 visible: false,
@@ -66,10 +75,37 @@ export default function ContextMenu() {
           >
             <p>Delete</p>
           </div>
-          <div className="flex flex-row hover:bg-zinc-800 rounded-lg px-2 py-1">
+          <div
+            className="flex flex-row hover:bg-zinc-800 rounded-lg px-2 py-1"
+            onClick={() => {
+              const videoId = app.queue?.find(
+                (item) => item.id === app.contextMenu.id,
+              )?.videoId;
+              if (!videoId) return;
+              window.open(
+                `${window.location.origin}/api/v1/youtube/download/${videoId}?filename=${
+                  app.queue?.find((item) => item.id === app.contextMenu.id)
+                    ?.title
+                }.mp3`,
+                "_blank",
+              );
+            }}
+          >
             <p>Download</p>
           </div>
-          <div className="flex flex-row hover:bg-zinc-800 rounded-lg px-2 py-1">
+          <div
+            className="flex flex-row hover:bg-zinc-800 rounded-lg px-2 py-1"
+            onClick={() => {
+              const videoId = app.queue?.find(
+                (item) => item.id === app.contextMenu.id,
+              )?.videoId;
+              if (!videoId) return;
+              window.open(
+                `https://www.youtube.com/watch?v=${videoId}`,
+                "_blank",
+              );
+            }}
+          >
             <p>Open on YouTube</p>
           </div>
         </div>

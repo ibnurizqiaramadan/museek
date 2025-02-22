@@ -5,6 +5,7 @@ import Queue from "@/components/templates/partials/Queue";
 import Controls from "@/components/templates/partials/Controls";
 import Search from "@/components/search/Search";
 import { HeroUIProvider } from "@heroui/react";
+import { ToastProvider } from "@heroui/toast";
 import { appStore } from "@/stores/AppStores";
 import { useEffect } from "react";
 import ContextMenu from "@/components/ContextMenu/ContextMenu";
@@ -28,6 +29,7 @@ export default function Layout() {
 
   return (
     <HeroUIProvider className="h-dvh select-none">
+      <ToastProvider placement="top-right" />
       <div
         className="flex flex-col justify-center bg-zinc-950 rounded-lg h-full p-3 gap-y-3"
         onClick={(e) => {

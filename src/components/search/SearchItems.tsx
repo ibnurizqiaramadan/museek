@@ -5,22 +5,23 @@ import { YoutubeSearchResponse } from "@/data/responseTypes";
 import { useState } from "react";
 import { addToQueue } from "@/data/model/queue.model";
 import { appStore } from "@/stores/AppStores";
+import { addToast } from "@heroui/toast";
 
 const SearchItems = ({
   item,
 }: {
   item: YoutubeSearchResponse["data"]["items"][0];
 }) => {
-  const [isLoading, setIsLoading] = useState(false);
+  const [isAdded, setIsAdded] = useState(false);
   const { app, setQueue } = appStore((state) => state);
   return (
     <div
       className={`rounded-lg flex flex-row justify-between h-[80px] items-center hover:bg-zinc-800 transition-all duration-300 cursor-pointer ${
-        isLoading ? "opacity-50" : ""
+        isAdded ? "hidden" : ""
       }`}
       onClick={async () => {
-        if (isLoading) return;
-        setIsLoading(true);
+        if (isAdded) return;
+        setIsAdded(true);
         const queue = {
           id: new Date().getTime().toString(),
           videoId: item.id.videoId,
@@ -30,8 +31,13 @@ const SearchItems = ({
           views: item.views,
         };
         await addToQueue(queue);
+        addToast({
+          title: "Added to queue",
+          description: item.title,
+          variant: "solid",
+          color: "success",
+        });
         setQueue([...(app.queue ?? []), queue]);
-        setIsLoading(false);
       }}
     >
       <div className="flex flex-row w-full items-center gap-2 text-white">
