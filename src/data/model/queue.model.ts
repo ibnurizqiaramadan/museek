@@ -12,8 +12,8 @@ export interface QueueItemType {
   snippet: YoutubeSearchResponse["data"]["items"][0]["snippet"];
 }
 
-db.version(1).stores({
-  queue: "++id, videoId, title, duration_raw, views, snippet",
+db.version(2).stores({
+  queue: "++id, videoId, title",
 });
 
 export const queue = db.table<QueueItemType>("queue");
