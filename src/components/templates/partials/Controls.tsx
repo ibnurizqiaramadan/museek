@@ -29,12 +29,37 @@ export default function Controls() {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [volume, setVolume] = useState<number>(50);
   const [savedVolume, setSavedVolume] = useLocalStorage("volume", 50);
+  const [savedProgress, setSavedProgress] = useLocalStorage("progress", 0);
+  const [firstLoad, setFirstLoad] = useState(false);
+
+  useEffect(() => {
+    if (savedProgress) {
+      setProgress(savedProgress);
+    }
+  }, [savedProgress]);
 
   useEffect(() => {
     if (savedVolume) {
       setVolume(savedVolume);
     }
   }, [savedVolume]);
+
+  useEffect(() => {
+    if (app.isMusicPlaying) {
+      if (audioRef.current) {
+        audioRef.current.play();
+        if (savedProgress && !firstLoad) {
+          audioRef.current.currentTime = savedProgress / 1000;
+          setFirstLoad(true);
+        }
+      }
+      return;
+    }
+
+    if (audioRef.current) {
+      audioRef.current.pause();
+    }
+  }, [app.isMusicPlaying, firstLoad, savedProgress]);
 
   const formattedProgress = useMemo(() => formatTime(progress), [progress]);
   const formattedDuration = useMemo(() => formatTime(duration), [duration]);
@@ -47,8 +72,9 @@ export default function Controls() {
 
   const handleTimeUpdate = () => {
     if (audioRef.current) {
-      setProgress(audioRef.current.currentTime * 1000);
-      if (audioRef.current.currentTime >= audioRef.current.duration) {
+      const currentTime = audioRef.current.currentTime * 1000;
+      setSavedProgress(currentTime);
+      if (currentTime >= duration) {
         const currentIndex = app.queue?.findIndex(
           (item) => item.videoId === app.nowPlaying?.videoId,
         );
