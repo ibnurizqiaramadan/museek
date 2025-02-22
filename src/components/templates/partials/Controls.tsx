@@ -1,11 +1,11 @@
 "use client";
 
-import { Button } from "@heroui/react";
 import Image from "next/image";
 import { appStore } from "@/stores/AppStores";
 import { useMemo, useState, useRef, useEffect } from "react";
 import { Slider } from "@heroui/react";
 import { useLocalStorage } from "usehooks-ts";
+import { FaPlay, FaPause, FaStepBackward, FaStepForward } from "react-icons/fa";
 
 const formatTime = (ms: number): string => {
   const totalSeconds = Math.floor(ms / 1000);
@@ -192,15 +192,24 @@ export default function Controls() {
         "
       >
         <div className="flex flex-row items-center justify-center gap-2">
-          <Button size="sm" className="rounded-full" onPress={handlePrevious}>
-            Previous
-          </Button>
-          <Button size="sm" className="rounded-full" onPress={handlePlay}>
-            {app.isMusicPlaying ? "Pause" : "Play"}
-          </Button>
-          <Button size="sm" className="rounded-full" onPress={handleNext}>
-            Next
-          </Button>
+          <div
+            className="rounded-full p-2 bg-zinc-600 cursor-pointer"
+            onClick={handlePrevious}
+          >
+            <FaStepBackward />
+          </div>
+          <div
+            className="rounded-full p-3 bg-zinc-600 cursor-pointer"
+            onClick={handlePlay}
+          >
+            {app.isMusicPlaying ? <FaPause /> : <FaPlay />}
+          </div>
+          <div
+            className="rounded-full p-2 bg-zinc-600 cursor-pointer"
+            onClick={handleNext}
+          >
+            <FaStepForward />
+          </div>
         </div>
         <div className="flex w-full flex-row items-center justify-center gap-3">
           <p className="text-sm text-zinc-400">{formattedProgress}</p>
