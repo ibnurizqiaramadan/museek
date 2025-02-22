@@ -6,6 +6,12 @@ import { useMemo, useState, useRef, useEffect } from "react";
 import { Slider } from "@heroui/react";
 import { useLocalStorage } from "usehooks-ts";
 import { FaPlay, FaPause, FaStepBackward, FaStepForward } from "react-icons/fa";
+import {
+  RxSpeakerOff,
+  RxSpeakerLoud,
+  RxSpeakerModerate,
+  RxSpeakerQuiet,
+} from "react-icons/rx";
 
 const formatTime = (ms: number): string => {
   const totalSeconds = Math.floor(ms / 1000);
@@ -125,7 +131,7 @@ export default function Controls() {
   };
 
   return (
-    <div className="flex flex-row justify-between items-center bg-zinc-900 rounded-lg max-h-[90px] flex-grow min-h-[90px] p-2 px-3">
+    <div className="flex flex-row justify-between items-center bg-zinc-900 rounded-lg max-h-[90px] flex-grow min-h-[90px] px-6">
       <div
         className="
         hidden
@@ -168,7 +174,7 @@ export default function Controls() {
         )}
       </div>
       <div
-        className=" 
+        className="
           flex-col 
           items-center 
           justify-center
@@ -251,15 +257,24 @@ export default function Controls() {
         </div>
       </div>
       <div className="hidden flex-row items-center xl:flex justify-end w-1/3">
+        {volume === 0 ? (
+          <RxSpeakerOff className="text-zinc-400 text-2xl" />
+        ) : volume < 30 ? (
+          <RxSpeakerQuiet className="text-zinc-400 text-2xl" />
+        ) : volume < 60 ? (
+          <RxSpeakerModerate className="text-zinc-400 text-2xl" />
+        ) : (
+          <RxSpeakerLoud className="text-zinc-400 text-2xl" />
+        )}
         <Slider
           aria-labelledby="volume-label"
-          size="md"
+          size="sm"
           value={volume}
           maxValue={100}
           minValue={0}
           step={1}
           showTooltip={true}
-          className="cursor-pointer max-w-[300px]"
+          className="cursor-pointer max-w-[200px] ml-2"
           onChange={(value) => {
             handleVolumeChange(value as number);
           }}
