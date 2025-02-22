@@ -2,12 +2,17 @@
 
 import { SearchYoutube } from "@/data/layer/search";
 import { Input } from "@heroui/react";
-import { useCallback, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { appStore } from "@/stores/AppStores";
 
 export default function Search() {
-  const { setSearch, setSearchInput, app } = appStore((state) => state);
+  const { setSearch, app } = appStore((state) => state);
   const debounceTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const [searchInput, setSearchInput] = useState(app.searchInput);
+
+  useEffect(() => {
+    setSearchInput(app.searchInput);
+  }, [app.searchInput]);
 
   const fetchSearch = useCallback(
     async (query: string) => {
@@ -15,12 +20,8 @@ export default function Search() {
         query,
       });
       if (error) console.log("error", error);
-      if (query.length > 1) {
-        console.log("response", response);
-        setSearch(response);
-      } else {
-        setSearch(null);
-      }
+      if (query.length > 1) return setSearch(response);
+      setSearch(null);
     },
     [setSearch],
   );
@@ -41,11 +42,22 @@ export default function Search() {
         isClearable
         className="rounded-lg w-full md:w-1/2 lg:w-1/3 p-0 m-0"
         placeholder="Search"
-        defaultValue={app.searchInput}
-        onKeyUp={(e) => {
-          const value = e.currentTarget.value.trim().replace(/\s+/g, " ");
+        value={searchInput}
+        onValueChange={(value) => {
+          if (value.length === 0) {
+            setSearchInput("");
+            setSearch(null);
+            return;
+          }
           setSearchInput(value);
           debounceFetchSearch(value);
+        }}
+        onKeyUp={(e) => {
+          if (e.key == "Escape") {
+            setSearchInput("");
+            setSearch(null);
+            console.log("escape", app.searchInput);
+          }
         }}
         onClear={() => {
           setSearchInput("");

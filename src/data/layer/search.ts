@@ -6,7 +6,7 @@ export const SearchYoutube = async ({ query }: { query: string }) => {
   return DataRequest({
     url: "v1:get:youtube/search",
     query: {
-      q: `${query}, official music`,
+      q: `${query.trim().replace(/\s+/g, " ")}, official music`,
     },
     useCache: true,
     cacheKey: `youtube-search-${query}`,
