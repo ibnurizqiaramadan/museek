@@ -3,6 +3,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { GetVideo } from "@/server/youtube";
 import fs from "fs";
+import { promisify } from "util";
 
 export async function GET(request: NextRequest) {
   const url = request.nextUrl.pathname.split("/").pop();
@@ -17,13 +18,9 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "Could not get video" }, { status: 500 });
   }
 
-  const fileStream = fs.createReadStream(file);
-  const buffer = await new Promise<Buffer>((resolve, reject) => {
-    const chunks: Buffer[] = [];
-    fileStream.on("data", (chunk) => chunks.push(Buffer.from(chunk)));
-    fileStream.on("end", () => resolve(Buffer.concat(chunks)));
-    fileStream.on("error", reject);
-  });
+  // Read file as buffer
+  const readFile = promisify(fs.readFile);
+  const buffer = await readFile(file); // Buffer type
 
   // Set headers to trigger a file download
   const response = new NextResponse(buffer, { status: 200 });
