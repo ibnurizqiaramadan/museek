@@ -38,6 +38,7 @@ export default function Search() {
     <div className="flex flex-grow items-center justify-center">
       <Input
         type="text"
+        isClearable
         className="rounded-lg w-full md:w-1/2 lg:w-1/3 p-0 m-0"
         placeholder="Search"
         defaultValue={app.searchInput}
@@ -45,6 +46,10 @@ export default function Search() {
           const value = e.currentTarget.value.trim().replace(/\s+/g, " ");
           setSearchInput(value);
           debounceFetchSearch(value);
+        }}
+        onClear={() => {
+          setSearchInput("");
+          setSearch(null);
         }}
       />
     </div>
