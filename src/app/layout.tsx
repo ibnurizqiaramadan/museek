@@ -15,12 +15,12 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   ...(process.env.NODE_ENV === "development"
     ? {
-        title: "Music Guys",
+        title: "Museek - Music Player (Preview)",
         description:
           "The website is running in development mode, some features may not work as expected, and expected features may not be available or getting errors and unstable.",
       }
     : {
-        title: "Music Guys",
+        title: "Museek - Music Player (Preview)",
         description: "Just a website that can play music",
       }),
 };
