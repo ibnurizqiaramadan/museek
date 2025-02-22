@@ -21,8 +21,8 @@ export default function Controls() {
   const [progress, setProgress] = useState(0);
   const [duration, setDuration] = useState(0);
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  const [volume, setVolume] = useState<number>(0);
-  const [savedVolume, setSavedVolume] = useLocalStorage("volume", 0);
+  const [volume, setVolume] = useState<number>(50);
+  const [savedVolume, setSavedVolume] = useLocalStorage("volume", 50);
 
   useEffect(() => {
     if (savedVolume) {
