@@ -40,23 +40,28 @@ const SearchItems = ({
         setQueue([...(app.queue ?? []), queue]);
       }}
     >
-      <div className="flex flex-row w-full items-center gap-2 text-white">
-        <Image
-          alt="Card background"
-          className="object-cover rounded-xl w-[80px] h-[80px] p-2"
-          src={item.snippet.thumbnails.url}
-          width={80}
-          height={80}
-        />
-        <div className="flex flex-col max-w-[calc(100%-80px)] overflow-hidden text-ellipsis">
-          <h4 className="font-bold text-large max-w-[calc(100%-80px) overflow-hidden whitespace-nowrap text-ellipsis">
-            {item.title}
-          </h4>
+      <div className="flex flex-row max-w-[calc(100%-80px)]">
+        <div className="flex flex-row w-full items-center gap-2 text-white">
+          <Image
+            alt="Card background"
+            className="object-cover rounded-xl w-[80px] h-[80px] min-w-[80px] min-h-[80px] p-2"
+            src={item.snippet.thumbnails.url}
+            width={80}
+            height={80}
+          />
+          <div className="flex flex-col overflow-hidden text-ellipsis">
+            <h4 className="font-bold text-large overflow-hidden whitespace-nowrap text-ellipsis">
+              {item.title}
+            </h4>
+            <p className="text-sm text-zinc-400 overflow-hidden whitespace-nowrap text-ellipsis">
+              {item.snippet.publishedAt}
+            </p>
+          </div>
         </div>
       </div>
       <div className="flex flex-col items-end">
         <p className="text-sm text-zinc-400 overflow-hidden whitespace-nowrap text-ellipsis px-3">
-          {item.duration_raw}
+          {item.snippet.duration}
         </p>
       </div>
     </div>
