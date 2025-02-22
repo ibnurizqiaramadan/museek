@@ -5,6 +5,7 @@ import Image from "next/image";
 import { appStore } from "@/stores/AppStores";
 import { useMemo, useState, useRef, useEffect } from "react";
 import { Slider } from "@heroui/react";
+import { useLocalStorage } from "usehooks-ts";
 
 const formatTime = (ms: number): string => {
   const totalSeconds = Math.floor(ms / 1000);
@@ -20,12 +21,14 @@ export default function Controls() {
   const [progress, setProgress] = useState(0);
   const [duration, setDuration] = useState(0);
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  const [volume, setVolume] = useState<number>(() => {
-    const savedVolume = localStorage.getItem("volume");
-    console.log(savedVolume);
+  const [volume, setVolume] = useState<number>(0);
+  const [savedVolume, setSavedVolume] = useLocalStorage("volume", 0);
 
-    return savedVolume ? parseInt(savedVolume) : 50;
-  });
+  useEffect(() => {
+    if (savedVolume) {
+      setVolume(savedVolume);
+    }
+  }, [savedVolume]);
 
   const formattedProgress = useMemo(() => formatTime(progress), [progress]);
   const formattedDuration = useMemo(() => formatTime(duration), [duration]);
@@ -249,7 +252,7 @@ export default function Controls() {
             if (audioRef.current) {
               const volume = value as number;
               setVolume(volume);
-              localStorage.setItem("volume", volume.toString());
+              setSavedVolume(volume);
               audioRef.current.volume = volume / 100;
             }
           }}
