@@ -34,7 +34,7 @@ const SearchItems = ({
         setIsLoading(false);
       }}
     >
-      <div className="flex flex-row w-full items-center gap-2">
+      <div className="flex flex-row w-full items-center gap-2 text-white">
         <Image
           alt="Card background"
           className="object-cover rounded-xl w-[80px] h-[80px] p-2"

@@ -30,7 +30,7 @@ const QueueItem = ({ item }: { item: QueueItemType }) => {
         width={80}
         height={80}
       />
-      <div className="flex flex-col max-w-[calc(100%-80px)] overflow-hidden text-ellipsis py-2">
+      <div className="flex flex-col max-w-[calc(100%-80px)] overflow-hidden text-ellipsis py-2 text-white">
         <h4
           className={`font-bold text-large overflow-hidden whitespace-nowrap text-ellipsis px-1 ${
             app.nowPlaying?.videoId === item.videoId && "text-green-500"
