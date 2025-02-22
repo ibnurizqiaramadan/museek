@@ -10,9 +10,8 @@ import { appStore } from "@/stores/AppStores";
 import { useEffect } from "react";
 import ContextMenu from "@/components/ContextMenu/ContextMenu";
 export default function Layout() {
-  const { app, setIsSidebarVisible, setContextMenu } = appStore(
-    (state) => state,
-  );
+  const { app, setIsSidebarVisible, setContextMenu, setIsMusicPlaying } =
+    appStore((state) => state);
 
   useEffect(() => {
     const handleResize = () => {
@@ -26,6 +25,23 @@ export default function Layout() {
       window.removeEventListener("resize", handleResize);
     };
   }, [setIsSidebarVisible]);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      console.log(e.key);
+
+      if (e.key === " ") {
+        e.preventDefault();
+        e.stopPropagation();
+        setIsMusicPlaying(!app.isMusicPlaying);
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [app.isMusicPlaying, setIsMusicPlaying]);
 
   return (
     <HeroUIProvider className="h-dvh select-none">
