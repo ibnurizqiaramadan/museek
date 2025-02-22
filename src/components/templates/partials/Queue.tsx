@@ -11,7 +11,6 @@ export default function Queue() {
   useEffect(() => {
     getQueue().then((items) => {
       setQueue(items);
-      console.log(items);
     });
   }, [setQueue]);
 
