@@ -68,19 +68,6 @@ export default function Controls() {
     }
   };
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const handleSeek = (event: React.MouseEvent<HTMLDivElement>) => {
-    event.preventDefault();
-    const progressBar = event.currentTarget;
-    const clickPosition =
-      event.clientX - progressBar.getBoundingClientRect().left;
-    const newTime = (clickPosition / progressBar.clientWidth) * duration; // Calculate new time in seconds
-    if (audioRef.current) {
-      audioRef.current.currentTime = newTime / 1000; // Set the audio current time in seconds
-      setProgress(newTime); // Update progress state
-    }
-  };
-
   const handlePlay = () => {
     if (audioRef.current) {
       if (app.isMusicPlaying) {
@@ -94,35 +81,47 @@ export default function Controls() {
     }
   };
 
-  const handleNext = () => {
-    const currentIndex = app.queue?.findIndex(
-      (item) => item.videoId === app.nowPlaying?.videoId,
-    );
-    const nextIndex =
-      currentIndex !== undefined && currentIndex >= 0 ? currentIndex + 1 : 0;
-
-    // Check if the next index is within bounds
-    if (app.queue && nextIndex < app.queue.length) {
-      setNowPlaying(app.queue[nextIndex]);
-    } else {
-      // If the end of the queue is reached, go back to the first item
-      setNowPlaying(app.queue?.[0] || null);
+  const handleProgressClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    const progressBar = e.currentTarget;
+    const clickPosition = e.clientX - progressBar.getBoundingClientRect().left;
+    const newTime = (clickPosition / progressBar.clientWidth) * duration;
+    if (audioRef.current) {
+      audioRef.current.currentTime = newTime / 1000;
+      setProgress(newTime);
     }
   };
 
-  const handlePrevious = () => {
-    const currentIndex = app.queue?.findIndex(
-      (item) => item.videoId === app.nowPlaying?.videoId,
-    );
-    const prevIndex =
-      currentIndex !== undefined && currentIndex > 0
-        ? currentIndex - 1
-        : app.queue?.length || 0; // Loop back to the last item if at the start
-
-    // Check if the previous index is within bounds
-    if (app.queue && prevIndex >= 0) {
-      setNowPlaying(app.queue[prevIndex]);
+  const handleSliderChange = (value: number) => {
+    if (audioRef.current) {
+      audioRef.current.currentTime = value / 1000;
+      setProgress(value);
     }
+  };
+
+  const handleVolumeChange = (value: number) => {
+    setVolume(value);
+    setSavedVolume(value);
+    if (audioRef.current) {
+      audioRef.current.volume = value / 100;
+    }
+  };
+
+  const handleNext = () => {
+    const { queue, nowPlaying } = app;
+    const currentIndex =
+      queue?.findIndex((item) => item.videoId === nowPlaying?.videoId) ?? -1;
+    const nextIndex = (currentIndex + 1) % (queue?.length || 1);
+    setNowPlaying(queue?.[nextIndex] || null);
+  };
+
+  const handlePrevious = () => {
+    const { queue, nowPlaying } = app;
+    const currentIndex =
+      queue?.findIndex((item) => item.videoId === nowPlaying?.videoId) ?? 0;
+    const prevIndex =
+      (currentIndex - 1 + (queue?.length || 1)) % (queue?.length || 1);
+    setNowPlaying(queue?.[prevIndex] || null);
   };
 
   return (
@@ -212,12 +211,16 @@ export default function Controls() {
               value={progress}
               maxValue={duration}
               className="cursor-pointer"
+              onClick={handleProgressClick}
+              onChange={(value) => {
+                handleSliderChange(value as number);
+              }}
             />
           </div>
           {app.nowPlaying?.videoId && (
             <audio
               ref={audioRef}
-              src={`/api/v1/youtube/stream/no-seek/${app.nowPlaying?.videoId}`}
+              src={`/api/v1/youtube/stream/${app.nowPlaying?.videoId}`}
               controls
               autoPlay
               hidden
@@ -249,12 +252,7 @@ export default function Controls() {
           showTooltip={true}
           className="cursor-pointer max-w-[300px]"
           onChange={(value) => {
-            setVolume(value as number);
-            setSavedVolume(value as number);
-            if (audioRef.current) {
-              const volume = value as number;
-              audioRef.current.volume = volume / 100;
-            }
+            handleVolumeChange(value as number);
           }}
         />
       </div>
