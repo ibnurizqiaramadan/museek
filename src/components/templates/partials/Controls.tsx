@@ -14,11 +14,12 @@ const formatTime = (ms: number): string => {
 };
 
 export default function Controls() {
-  const { app, setNowPlaying } = appStore((state) => state);
+  const { app, setNowPlaying, setIsMusicPlaying, setIsMusicLoading } = appStore(
+    (state) => state,
+  );
   const [progress, setProgress] = useState(0);
   const [duration, setDuration] = useState(0);
   const audioRef = useRef<HTMLAudioElement>(null);
-  const [isPlaying, setIsPlaying] = useState(false);
   const [volume, setVolume] = useState(50);
 
   const formattedProgress = useMemo(() => formatTime(progress), [progress]);
@@ -68,12 +69,13 @@ export default function Controls() {
 
   const handlePlay = () => {
     if (audioRef.current) {
-      if (isPlaying) {
+      if (app.isMusicPlaying) {
         audioRef.current.pause();
       } else {
         audioRef.current.play();
+        setIsMusicLoading(false);
       }
-      setIsPlaying(!isPlaying);
+      setIsMusicPlaying(!app.isMusicPlaying);
     }
   };
 
@@ -180,7 +182,7 @@ export default function Controls() {
             Previous
           </Button>
           <Button size="sm" className="rounded-full" onPress={handlePlay}>
-            {isPlaying ? "Pause" : "Play"}
+            {app.isMusicPlaying ? "Pause" : "Play"}
           </Button>
           <Button size="sm" className="rounded-full" onPress={handleNext}>
             Next
@@ -206,8 +208,14 @@ export default function Controls() {
               hidden
               onTimeUpdate={handleTimeUpdate}
               onLoadedMetadata={handleLoadedMetadata}
-              onPlay={() => setIsPlaying(true)}
-              onPause={() => setIsPlaying(false)}
+              onPlay={() => {
+                setIsMusicPlaying(true);
+                setIsMusicLoading(false);
+              }}
+              onPause={() => {
+                setIsMusicPlaying(false);
+                setIsMusicLoading(false);
+              }}
             />
           )}
           <p className="text-sm text-zinc-400">{formattedDuration}</p>

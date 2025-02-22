@@ -8,6 +8,8 @@ export const appStore = create<AppStore>((set) => ({
     queue: null,
     nowPlaying: null,
     isSidebarVisible: false,
+    isMusicPlaying: false,
+    isMusicLoading: false,
     contextMenu: {
       id: null,
       visible: false,
@@ -25,4 +27,8 @@ export const appStore = create<AppStore>((set) => ({
     set((state) => ({ app: { ...state.app, isSidebarVisible } })),
   setContextMenu: (contextMenu) =>
     set((state) => ({ app: { ...state.app, contextMenu } })),
+  setIsMusicPlaying: (isMusicPlaying) =>
+    set((state) => ({ app: { ...state.app, isMusicPlaying } })),
+  setIsMusicLoading: (isMusicLoading) =>
+    set((state) => ({ app: { ...state.app, isMusicLoading } })),
 }));
