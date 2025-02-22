@@ -26,6 +26,13 @@ export default function Queue() {
     >
       <div className="overflow-y-auto max-h-[calc(100dvh-196px)] max-w-[calc(100%)] overflow-hidden text-ellipsis whitespace-nowrap">
         <div
+          className={`text-zinc-400 text-wrap text-center h-[calc(100dvh-196px)] flex items-center justify-center ${
+            app.queue?.length && app.queue?.length > 0 ? "hidden" : ""
+          }`}
+        >
+          No queue, try to search for some songs and add them to the queue
+        </div>
+        <div
           className={`${app.queue?.length && app.queue?.length > 0 ? "" : "hidden"}`}
         >
           <>
