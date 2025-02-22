@@ -32,6 +32,17 @@ export default function Controls() {
   const [savedProgress, setSavedProgress] = useLocalStorage("progress", 0);
   const [firstLoad, setFirstLoad] = useState(false);
 
+  const [currentPlaying, setCurrentPlaying] = useLocalStorage(
+    `current-playing`,
+    app.nowPlaying,
+  );
+
+  useEffect(() => {
+    if (currentPlaying) {
+      setNowPlaying(currentPlaying);
+    }
+  }, [currentPlaying, setNowPlaying]);
+
   useEffect(() => {
     if (savedProgress) {
       setProgress(savedProgress);
@@ -110,6 +121,7 @@ export default function Controls() {
         setIsMusicLoading(false);
       }
       setIsMusicPlaying(!app.isMusicPlaying);
+      setCurrentPlaying(app.nowPlaying);
     }
   };
 
@@ -271,6 +283,7 @@ export default function Controls() {
                 e.currentTarget.volume = volume / 100;
                 setIsMusicPlaying(true);
                 setIsMusicLoading(false);
+                setCurrentPlaying(app.nowPlaying);
               }}
               onPause={(e) => {
                 e.currentTarget.volume = 0;

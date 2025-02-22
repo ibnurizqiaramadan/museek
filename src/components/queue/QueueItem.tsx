@@ -3,25 +3,12 @@
 import { Image, Spinner } from "@heroui/react";
 import { QueueItemType } from "@/data/model/queue.model";
 import { appStore } from "@/stores/AppStores";
-import { useLocalStorage } from "usehooks-ts";
-import { useEffect } from "react";
 const QueueItem = ({ item }: { item: QueueItemType }) => {
   const { app, setNowPlaying, setContextMenu, setIsMusicLoading } = appStore(
     (state) => state,
   );
 
-  const [currentPlaying, setCurrentPlaying] = useLocalStorage(
-    `current-playing`,
-    app.nowPlaying,
-  );
-
   const isSelected = app.nowPlaying?.videoId === item.videoId;
-
-  useEffect(() => {
-    if (currentPlaying) {
-      setNowPlaying(currentPlaying);
-    }
-  }, [currentPlaying, setNowPlaying]);
 
   return (
     <div
@@ -31,7 +18,6 @@ const QueueItem = ({ item }: { item: QueueItemType }) => {
       data-id={item.id}
       onClick={() => {
         setNowPlaying(item);
-        setCurrentPlaying(item);
         if (app.nowPlaying?.videoId !== item.videoId) {
           setIsMusicLoading(true);
         }
