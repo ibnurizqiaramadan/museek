@@ -249,10 +249,10 @@ export default function Controls() {
           showTooltip={true}
           className="cursor-pointer max-w-[300px]"
           onChange={(value) => {
+            setVolume(value as number);
+            setSavedVolume(value as number);
             if (audioRef.current) {
               const volume = value as number;
-              setVolume(volume);
-              setSavedVolume(volume);
               audioRef.current.volume = volume / 100;
             }
           }}
