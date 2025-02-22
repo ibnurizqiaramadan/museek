@@ -3,7 +3,7 @@
 import { Button } from "@heroui/react";
 import Image from "next/image";
 import { appStore } from "@/stores/AppStores";
-import { useMemo, useState, useRef } from "react";
+import { useMemo, useState, useRef, useEffect } from "react";
 import { Slider } from "@heroui/react";
 
 const formatTime = (ms: number): string => {
@@ -19,11 +19,22 @@ export default function Controls() {
   );
   const [progress, setProgress] = useState(0);
   const [duration, setDuration] = useState(0);
-  const audioRef = useRef<HTMLAudioElement>(null);
-  const [volume, setVolume] = useState(50);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const [volume, setVolume] = useState<number>(() => {
+    const savedVolume = localStorage.getItem("volume");
+    console.log(savedVolume);
+
+    return savedVolume ? parseInt(savedVolume) : 50;
+  });
 
   const formattedProgress = useMemo(() => formatTime(progress), [progress]);
   const formattedDuration = useMemo(() => formatTime(duration), [duration]);
+
+  useEffect(() => {
+    if (audioRef.current) {
+      audioRef.current.volume = volume / 100;
+    }
+  }, [volume]);
 
   const handleTimeUpdate = () => {
     if (audioRef.current) {
@@ -73,6 +84,7 @@ export default function Controls() {
         audioRef.current.pause();
       } else {
         audioRef.current.play();
+        audioRef.current.volume = volume / 100;
         setIsMusicLoading(false);
       }
       setIsMusicPlaying(!app.isMusicPlaying);
@@ -208,11 +220,13 @@ export default function Controls() {
               hidden
               onTimeUpdate={handleTimeUpdate}
               onLoadedMetadata={handleLoadedMetadata}
-              onPlay={() => {
+              onPlay={(e) => {
+                e.currentTarget.volume = volume / 100;
                 setIsMusicPlaying(true);
                 setIsMusicLoading(false);
               }}
-              onPause={() => {
+              onPause={(e) => {
+                e.currentTarget.volume = 0;
                 setIsMusicPlaying(false);
                 setIsMusicLoading(false);
               }}
@@ -225,7 +239,7 @@ export default function Controls() {
         <Slider
           aria-labelledby="volume-label"
           size="md"
-          defaultValue={volume}
+          value={volume}
           maxValue={100}
           minValue={0}
           step={1}
@@ -235,6 +249,7 @@ export default function Controls() {
             if (audioRef.current) {
               const volume = value as number;
               setVolume(volume);
+              localStorage.setItem("volume", volume.toString());
               audioRef.current.volume = volume / 100;
             }
           }}
