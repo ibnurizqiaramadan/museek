@@ -1,14 +1,22 @@
 "use client";
 
 import { Image, Spinner } from "@heroui/react";
-import { QueueItemType } from "@/data/model/queue.model";
 import { appStore } from "@/stores/AppStores";
-const QueueItem = ({ item }: { item: QueueItemType }) => {
+import { GetQueueByUserResponse, QueueItemTypes } from "@/data/responseTypes";
+
+const QueueItem = ({
+  item,
+}: {
+  item: GetQueueByUserResponse["queue"][0]["queue_items_aggregate"]["nodes"][0];
+}) => {
   const { app, setNowPlaying, setContextMenu, setIsMusicLoading } = appStore(
     (state) => state,
   );
 
-  const isSelected = app.nowPlaying?.videoId === item.videoId;
+  const isSelected = app.nowPlaying?.id === item.id;
+
+  const snippet: QueueItemTypes["snippet"] =
+    typeof item.snippet === "string" ? JSON.parse(item.snippet) : item.snippet;
 
   return (
     <div
@@ -18,14 +26,14 @@ const QueueItem = ({ item }: { item: QueueItemType }) => {
       data-id={item.id}
       onClick={() => {
         setNowPlaying(item);
-        if (app.nowPlaying?.videoId !== item.videoId) {
+        if (app.nowPlaying?.id !== item.id) {
           setIsMusicLoading(true);
         }
       }}
       onContextMenu={(e) => {
         e.preventDefault();
         setContextMenu({
-          id: item.id,
+          id: item.id ?? null,
           visible: true,
           x: e.pageX,
           y: e.pageY,
@@ -46,7 +54,7 @@ const QueueItem = ({ item }: { item: QueueItemType }) => {
             <Image
               alt="Card background"
               className="object-cover rounded-xl w-[80px] h-[80px] min-w-[80px] min-h-[80px] p-2"
-              src={item.snippet.thumbnails.url}
+              src={snippet.thumbnails.url}
               width={80}
               height={80}
             />
@@ -71,7 +79,7 @@ const QueueItem = ({ item }: { item: QueueItemType }) => {
           onClick={(e) => {
             e.stopPropagation();
             setContextMenu({
-              id: item.id,
+              id: item.id ?? null,
               visible: true,
               x: e.pageX,
               y: e.pageY,

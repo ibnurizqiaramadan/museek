@@ -6,12 +6,12 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { appStore } from "@/stores/AppStores";
 
 export default function Search() {
-  const { setSearch, app } = appStore((state) => state);
+  const { setSearch, app, setSearchInput } = appStore((state) => state);
   const debounceTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const [searchInput, setSearchInput] = useState(app.searchInput);
+  const [stateSearchInput, setStateSearchInput] = useState(app.searchInput);
 
   useEffect(() => {
-    setSearchInput(app.searchInput);
+    setStateSearchInput(app.searchInput);
   }, [app.searchInput]);
 
   const fetchSearch = useCallback(
@@ -42,25 +42,25 @@ export default function Search() {
         isClearable
         className="rounded-lg w-full md:w-1/2 lg:w-1/3 p-0 m-0"
         placeholder="Search"
-        value={searchInput}
+        value={stateSearchInput}
         onValueChange={(value) => {
           if (value.length === 0) {
-            setSearchInput("");
+            setStateSearchInput("");
             setSearch(null);
             return;
           }
+          setStateSearchInput(value);
           setSearchInput(value);
           debounceFetchSearch(value);
         }}
         onKeyUp={(e) => {
           if (e.key == "Escape") {
-            setSearchInput("");
+            setStateSearchInput("");
             setSearch(null);
-            console.log("escape", app.searchInput);
           }
         }}
         onClear={() => {
-          setSearchInput("");
+          setStateSearchInput("");
           setSearch(null);
         }}
       />

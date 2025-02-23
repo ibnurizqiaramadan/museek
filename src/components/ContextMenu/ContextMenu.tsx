@@ -80,7 +80,7 @@ export default function ContextMenu() {
             onClick={() => {
               const videoId = app.queue?.find(
                 (item) => item.id === app.contextMenu.id,
-              )?.videoId;
+              )?.id;
               if (!videoId) return;
               window.open(
                 `${window.location.origin}/api/v1/youtube/download/${videoId}?filename=${
@@ -98,7 +98,7 @@ export default function ContextMenu() {
             onClick={() => {
               const videoId = app.queue?.find(
                 (item) => item.id === app.contextMenu.id,
-              )?.videoId;
+              )?.id;
               if (!videoId) return;
               window.open(
                 `https://www.youtube.com/watch?v=${videoId}`,

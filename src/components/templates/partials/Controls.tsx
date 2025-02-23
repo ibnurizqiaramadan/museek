@@ -87,7 +87,7 @@ export default function Controls() {
       setSavedProgress(currentTime);
       if (currentTime >= duration) {
         const currentIndex = app.queue?.findIndex(
-          (item) => item.videoId === app.nowPlaying?.videoId,
+          (item) => item.id === app.nowPlaying?.id,
         );
         const nextIndex =
           currentIndex !== undefined && currentIndex >= 0
@@ -154,7 +154,7 @@ export default function Controls() {
   const handleNext = () => {
     const { queue, nowPlaying } = app;
     const currentIndex =
-      queue?.findIndex((item) => item.videoId === nowPlaying?.videoId) ?? -1;
+      queue?.findIndex((item) => item.id === nowPlaying?.id) ?? -1;
     const nextIndex = (currentIndex + 1) % (queue?.length || 1);
     setNowPlaying(queue?.[nextIndex] || null);
   };
@@ -162,7 +162,7 @@ export default function Controls() {
   const handlePrevious = () => {
     const { queue, nowPlaying } = app;
     const currentIndex =
-      queue?.findIndex((item) => item.videoId === nowPlaying?.videoId) ?? 0;
+      queue?.findIndex((item) => item.id === nowPlaying?.id) ?? 0;
     const prevIndex =
       (currentIndex - 1 + (queue?.length || 1)) % (queue?.length || 1);
     setNowPlaying(queue?.[prevIndex] || null);
@@ -270,10 +270,10 @@ export default function Controls() {
               }}
             />
           </div>
-          {app.nowPlaying?.videoId && (
+          {app.nowPlaying?.id && (
             <audio
               ref={audioRef}
-              src={`/api/v1/youtube/stream/${app.nowPlaying?.videoId}`}
+              src={`/api/v1/youtube/stream/${app.nowPlaying?.id}`}
               controls
               autoPlay
               hidden
