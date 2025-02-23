@@ -1,12 +1,11 @@
 "use client";
 
 import { Image } from "@heroui/react";
-import { YoutubeSearchResponse } from "@/data/responseTypes";
+import { YoutubeSearchResponse, QueueItemDbTypes } from "@/data/responseTypes";
 import { useState } from "react";
-import { addToQueue } from "@/data/model/queue.model";
 import { appStore } from "@/stores/AppStores";
 import { addToast } from "@heroui/toast";
-
+import { AddQueueItem } from "@/data/layer/queue";
 const SearchItems = ({
   item,
 }: {
@@ -22,15 +21,23 @@ const SearchItems = ({
       onClick={async () => {
         if (isAdded) return;
         setIsAdded(true);
-        const queue = {
-          id: new Date().getTime().toString(),
+        const [data, error] = await AddQueueItem(item, app.queueId ?? "");
+
+        if (error) {
+          addToast({
+            title: "Error adding to queue",
+            description: error.errors.message,
+            variant: "solid",
+            color: "danger",
+          });
+        }
+
+        const queue: QueueItemDbTypes = {
+          ...item,
+          id: data?.insert_queue_items_one.id as string,
           videoId: item.id.videoId,
-          title: item.title,
-          duration_raw: item.duration_raw,
-          snippet: item.snippet,
-          views: item.views,
         };
-        await addToQueue(queue);
+
         addToast({
           title: "Added to queue",
           description: item.title,

@@ -1,9 +1,9 @@
 "use client";
 
 import { appStore } from "@/stores/AppStores";
-import { deleteFromQueue } from "@/data/model/queue.model";
 import { useEffect, useState } from "react";
 import { addToast } from "@heroui/toast";
+import { DeleteQueueItem, GetVideoById } from "@/data/layer/queue";
 
 export default function ContextMenu() {
   const { app, setQueue, setContextMenu } = appStore((state) => state);
@@ -52,10 +52,21 @@ export default function ContextMenu() {
           <div
             className="flex flex-row hover:bg-zinc-800 rounded-lg px-2 py-1"
             onClick={async () => {
-              await deleteFromQueue(app.contextMenu?.id as string);
+              const [data, error] = await DeleteQueueItem(
+                app.contextMenu?.id as string,
+              );
+              if (error) {
+                addToast({
+                  title: "Error deleting from queue",
+                  description: error.errors.message,
+                  variant: "solid",
+                  color: "danger",
+                });
+              }
               setQueue(
-                app.queue?.filter((item) => item.id !== app.contextMenu.id) ||
-                  null,
+                app.queue?.filter(
+                  (item) => item.id !== data?.delete_queue_items_by_pk.id,
+                ) || null,
               );
               addToast({
                 title: "Deleted from queue",
@@ -80,7 +91,7 @@ export default function ContextMenu() {
             onClick={() => {
               const videoId = app.queue?.find(
                 (item) => item.id === app.contextMenu.id,
-              )?.videoId;
+              )?.id;
               if (!videoId) return;
               window.open(
                 `${window.location.origin}/api/v1/youtube/download/${videoId}?filename=${
@@ -95,13 +106,21 @@ export default function ContextMenu() {
           </div>
           <div
             className="flex flex-row hover:bg-zinc-800 rounded-lg px-2 py-1"
-            onClick={() => {
-              const videoId = app.queue?.find(
-                (item) => item.id === app.contextMenu.id,
-              )?.videoId;
-              if (!videoId) return;
+            onClick={async () => {
+              const [video, error] = await GetVideoById(
+                app.contextMenu?.id as string,
+              );
+              if (error) {
+                addToast({
+                  title: "Error getting video",
+                  description: error.errors.message,
+                  variant: "solid",
+                  color: "danger",
+                });
+              }
+              if (!video) return;
               window.open(
-                `https://www.youtube.com/watch?v=${videoId}`,
+                `https://www.youtube.com/watch?v=${video.queue_items[0].video_id}`,
                 "_blank",
               );
             }}

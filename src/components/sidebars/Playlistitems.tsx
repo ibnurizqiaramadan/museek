@@ -1,7 +1,16 @@
-import { SpotifyPlaylist } from "@/data/responseTypes";
 import { Image } from "@heroui/react";
 
-export default function PlaylistItems({ item }: { item: SpotifyPlaylist }) {
+export default function PlaylistItems({
+  item,
+}: {
+  item: {
+    images: {
+      url: string;
+    }[];
+    name: string;
+    owner: { display_name: string };
+  };
+}) {
   return (
     <div className="flex flex-row items-center gap-2 rounded-lg hover:bg-zinc-800 transition-all duration-300 cursor-pointer">
       <Image

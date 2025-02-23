@@ -1,10 +1,12 @@
 import {
-  QueueResponse,
   YoutubeSearchResponse,
-  TokenResponse,
-  DeviceResponse,
-  SpotifyNowPlaying,
-  SpotifyPlaylistResponse,
+  UserResponse,
+  CreateUserResponse,
+  GetQueueByUserResponse,
+  CreateQueueResponse,
+  CreateQueueItemResponse,
+  GetVideoByIdResponse,
+  DeleteQueueItemResponse,
 } from "./responseTypes";
 
 /**
@@ -13,25 +15,30 @@ import {
  */
 export function getAPIPathMap() {
   return {
-    v1: {
-      "get:me/player": {
-        response: {} as SpotifyNowPlaying,
+    hasura: {
+      "post:users": {
+        response: {} as CreateUserResponse,
       },
-      "get:me/player/queue": {
-        response: {} as QueueResponse,
+      "get:users/:id": {
+        response: {} as UserResponse,
       },
-      "post:me/player/queue": {
-        response: {} as string,
+      "get:queue/user/:user_id": {
+        response: {} as GetQueueByUserResponse,
       },
-      "get:me/player/devices": {
-        response: {} as DeviceResponse,
+      "post:queue": {
+        response: {} as CreateQueueResponse,
       },
-      "get:me/playlists": {
-        response: {} as SpotifyPlaylistResponse,
+      "post:queue/items": {
+        response: {} as CreateQueueItemResponse,
       },
-      "post:api/token": {
-        response: {} as TokenResponse,
+      "get:queue/items/:id": {
+        response: {} as GetVideoByIdResponse,
       },
+      "delete:queue/items/:id": {
+        response: {} as DeleteQueueItemResponse,
+      },
+    },
+    internal: {
       "get:youtube/search": {
         response: {} as YoutubeSearchResponse,
       },

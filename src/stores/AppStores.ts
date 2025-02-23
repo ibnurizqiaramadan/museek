@@ -6,6 +6,7 @@ export const appStore = create<AppStore>((set) => ({
     search: null,
     searchInput: "",
     queue: null,
+    queueId: null,
     nowPlaying: null,
     isSidebarVisible: false,
     isMusicPlaying: false,
@@ -21,6 +22,7 @@ export const appStore = create<AppStore>((set) => ({
   setSearchInput: (searchInput) =>
     set((state) => ({ app: { ...state.app, searchInput } })),
   setQueue: (queue) => set((state) => ({ app: { ...state.app, queue } })),
+  setQueueId: (queueId) => set((state) => ({ app: { ...state.app, queueId } })),
   setNowPlaying: (nowPlaying) =>
     set((state) => ({ app: { ...state.app, nowPlaying } })),
   setIsSidebarVisible: (isSidebarVisible) =>

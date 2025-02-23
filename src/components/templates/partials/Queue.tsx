@@ -2,17 +2,9 @@
 
 import { appStore } from "@/stores/AppStores";
 import QueueItem from "@/components/queue/QueueItem";
-import { useEffect } from "react";
-import { getQueue } from "@/data/model/queue.model";
 
 export default function Queue() {
-  const { app, setQueue } = appStore((state) => state);
-
-  useEffect(() => {
-    getQueue().then((items) => {
-      setQueue(items);
-    });
-  }, [setQueue]);
+  const { app } = appStore((state) => state);
 
   return (
     <div

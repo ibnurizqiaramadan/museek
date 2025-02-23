@@ -9,9 +9,31 @@ import { ToastProvider } from "@heroui/toast";
 import { appStore } from "@/stores/AppStores";
 import { useEffect } from "react";
 import ContextMenu from "@/components/ContextMenu/ContextMenu";
-export default function Layout() {
-  const { app, setIsSidebarVisible, setContextMenu, setIsMusicPlaying } =
-    appStore((state) => state);
+import { GetQueueByUserResponse } from "@/data/responseTypes";
+import { decodeJWT } from "@/server/jwt";
+
+export default function Layout(props: {
+  queue: GetQueueByUserResponse["queue"][0]["queue_items_aggregate"]["nodes"];
+  accessToken: string;
+}) {
+  const {
+    app,
+    setIsSidebarVisible,
+    setContextMenu,
+    setIsMusicPlaying,
+    setQueue,
+    setQueueId,
+  } = appStore((state) => state);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setQueue(props.queue);
+      const decoded = await decodeJWT(props.accessToken);
+      setQueueId(decoded?.payload?.queueId ?? null);
+    };
+
+    fetchData();
+  }, [props.queue, props.accessToken, setQueue, setQueueId]);
 
   useEffect(() => {
     const handleResize = () => {

@@ -4,15 +4,18 @@ import { NextRequest, NextResponse } from "next/server";
 import { GetVideo } from "@/server/youtube";
 import fs from "fs";
 import { Readable } from "stream";
+import { GetVideoById } from "@/data/layer/queue";
 
 export async function GET(request: NextRequest) {
   const url = request.nextUrl.pathname.split("/").pop();
 
-  if (!url) {
+  const [video, error] = await GetVideoById(url || "");
+
+  if (error) {
     return NextResponse.json({ error: "No url provided" }, { status: 400 });
   }
 
-  const file = await GetVideo(url);
+  const file = await GetVideo(video?.queue_items[0]?.video_id || "");
   const stat = fs.statSync(file as string);
   const { size } = stat;
 

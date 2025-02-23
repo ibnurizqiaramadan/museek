@@ -1,12 +1,12 @@
-import { YoutubeSearchResponse } from "@/data/responseTypes";
-import { QueueItemType } from "@/data/model/queue.model";
+import { YoutubeSearchResponse, QueueItemDbTypes } from "@/data/responseTypes";
 
 export type AppStore = {
   app: {
     search: YoutubeSearchResponse | null;
     searchInput: string;
-    queue: QueueItemType[] | null;
-    nowPlaying: QueueItemType | null;
+    queue: QueueItemDbTypes[] | null;
+    queueId: string | null;
+    nowPlaying: QueueItemDbTypes | null;
     isSidebarVisible: boolean;
     isMusicPlaying: boolean;
     isMusicLoading: boolean;
@@ -19,8 +19,9 @@ export type AppStore = {
   };
   setSearch: (search: YoutubeSearchResponse | null) => void;
   setSearchInput: (searchInput: string) => void;
-  setQueue: (queue: QueueItemType[] | null) => void;
-  setNowPlaying: (nowPlaying: QueueItemType | null) => void;
+  setQueue: (queue: QueueItemDbTypes[] | null) => void;
+  setQueueId: (queueId: string | null) => void;
+  setNowPlaying: (nowPlaying: QueueItemDbTypes | null) => void;
   setIsSidebarVisible: (isSidebarVisible: boolean) => void;
   setIsMusicPlaying: (isMusicPlaying: boolean) => void;
   setIsMusicLoading: (isMusicLoading: boolean) => void;
