@@ -111,3 +111,9 @@ export type GetVideoByIdResponse = {
     },
   ];
 };
+
+export type DeleteQueueItemResponse = {
+  delete_queue_items_by_pk: {
+    id: string;
+  };
+};

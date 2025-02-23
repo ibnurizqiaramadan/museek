@@ -62,3 +62,15 @@ export const GetVideoById = async (videoId: string) => {
     },
   });
 };
+
+export const DeleteQueueItem = async (videoId: string) => {
+  return DataRequest({
+    url: "hasura:delete:queue/items/:id",
+    headers: {
+      "x-hasura-admin-secret": process.env.HASURA_ADMIN_SECRET,
+    },
+    params: {
+      id: videoId,
+    },
+  });
+};

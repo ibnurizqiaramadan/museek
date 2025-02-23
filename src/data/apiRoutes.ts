@@ -6,6 +6,7 @@ import {
   CreateQueueResponse,
   CreateQueueItemResponse,
   GetVideoByIdResponse,
+  DeleteQueueItemResponse,
 } from "./responseTypes";
 
 /**
@@ -32,6 +33,9 @@ export function getAPIPathMap() {
       },
       "get:queue/items/:id": {
         response: {} as GetVideoByIdResponse,
+      },
+      "delete:queue/items/:id": {
+        response: {} as DeleteQueueItemResponse,
       },
     },
     internal: {
