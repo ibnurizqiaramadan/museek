@@ -66,10 +66,6 @@ export default function Controls() {
       }
       return;
     }
-
-    if (audioRef.current) {
-      audioRef.current.pause();
-    }
   }, [app.isMusicPlaying, firstLoad, savedProgress]);
 
   const formattedProgress = useMemo(() => formatTime(progress), [progress]);
@@ -84,6 +80,7 @@ export default function Controls() {
   const handleTimeUpdate = () => {
     if (audioRef.current) {
       const currentTime = audioRef.current.currentTime * 1000;
+      setIsMusicLoading(false);
       setSavedProgress(currentTime);
       if (currentTime >= duration) {
         const currentIndex = app.queue?.findIndex(
