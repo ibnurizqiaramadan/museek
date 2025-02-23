@@ -3,7 +3,7 @@
 import { Image, Spinner } from "@heroui/react";
 import { appStore } from "@/stores/AppStores";
 import { GetQueueByUserResponse, QueueItemTypes } from "@/data/responseTypes";
-import { useMemo, MouseEvent } from "react";
+import { useMemo, MouseEvent, useEffect } from "react";
 
 const QueueItem = ({
   item,
@@ -25,8 +25,13 @@ const QueueItem = ({
 
   const handleClick = () => {
     setNowPlaying(item);
-    setIsMusicLoading(true);
   };
+
+  useEffect(() => {
+    if (app.nowPlaying?.id !== item.id) {
+      setIsMusicLoading(true);
+    }
+  }, [app.nowPlaying?.id, item.id, setIsMusicLoading]);
 
   const handleContextMenu = (e: MouseEvent) => {
     e.preventDefault();
@@ -58,7 +63,7 @@ const QueueItem = ({
           <Image
             alt="Card background"
             className={`object-cover rounded-xl w-[80px] h-[80px] min-w-[80px] min-h-[80px] p-2 ${
-              app.nowPlaying?.id === item.id && app.isMusicLoading
+              app.isMusicLoading && app.nowPlaying?.id === item.id
                 ? "opacity-40"
                 : ""
             }`}

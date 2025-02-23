@@ -12,16 +12,18 @@ const SearchItems = ({
   item: YoutubeSearchResponse["data"]["items"][0];
 }) => {
   const [isAdded, setIsAdded] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const { app, setQueue } = appStore((state) => state);
   return (
     <div
       className={`rounded-lg flex flex-row justify-between h-[80px] items-center hover:bg-zinc-800 transition-all duration-300 cursor-pointer ${
         isAdded ? "hidden" : ""
-      }`}
+      } ${isLoading ? "opacity-50" : ""}`}
       onClick={async () => {
         if (isAdded) return;
-        setIsAdded(true);
+        setIsLoading(true);
         const [data, error] = await AddQueueItem(item, app.queueId ?? "");
+        setIsAdded(true);
 
         if (error) {
           addToast({
@@ -45,6 +47,7 @@ const SearchItems = ({
           color: "success",
         });
         setQueue([...(app.queue ?? []), queue]);
+        setIsLoading(false);
       }}
     >
       <div className="flex flex-row max-w-[calc(100%-80px)]">

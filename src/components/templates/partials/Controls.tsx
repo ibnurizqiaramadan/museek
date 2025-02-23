@@ -12,6 +12,7 @@ import {
   RxSpeakerModerate,
   RxSpeakerQuiet,
 } from "react-icons/rx";
+import { QueueItemTypes } from "@/data/responseTypes";
 
 const formatTime = (ms: number): string => {
   const totalSeconds = Math.floor(ms / 1000);
@@ -80,7 +81,6 @@ export default function Controls() {
   const handleTimeUpdate = () => {
     if (audioRef.current) {
       const currentTime = audioRef.current.currentTime * 1000;
-      setIsMusicLoading(false);
       setSavedProgress(currentTime);
       if (currentTime >= duration) {
         const currentIndex = app.queue?.findIndex(
@@ -115,7 +115,6 @@ export default function Controls() {
       } else {
         audioRef.current.play();
         audioRef.current.volume = volume / 100;
-        setIsMusicLoading(false);
       }
       setIsMusicPlaying(!app.isMusicPlaying);
       setCurrentPlaying(app.nowPlaying);
@@ -154,6 +153,7 @@ export default function Controls() {
       queue?.findIndex((item) => item.id === nowPlaying?.id) ?? -1;
     const nextIndex = (currentIndex + 1) % (queue?.length || 1);
     setNowPlaying(queue?.[nextIndex] || null);
+    setIsMusicLoading(true);
   };
 
   const handlePrevious = () => {
@@ -163,7 +163,16 @@ export default function Controls() {
     const prevIndex =
       (currentIndex - 1 + (queue?.length || 1)) % (queue?.length || 1);
     setNowPlaying(queue?.[prevIndex] || null);
+    setIsMusicLoading(true);
   };
+
+  const snippet: QueueItemTypes["snippet"] = useMemo(
+    () =>
+      typeof app.nowPlaying?.snippet === "string"
+        ? JSON.parse(app.nowPlaying?.snippet)
+        : app.nowPlaying?.snippet,
+    [app.nowPlaying?.snippet],
+  );
 
   return (
     <div className="flex flex-row justify-between items-center bg-zinc-900 rounded-lg max-h-[90px] flex-grow min-h-[90px] px-6">
@@ -182,11 +191,11 @@ export default function Controls() {
         sm:w-1/2
         "
       >
-        {app?.nowPlaying?.snippet?.thumbnails?.url ? (
+        {snippet?.thumbnails?.url ? (
           <>
             <Image
               className="rounded-lg"
-              src={app.nowPlaying.snippet.thumbnails.url}
+              src={snippet.thumbnails.url}
               alt="Spotify"
               width={60}
               height={60}
@@ -195,10 +204,10 @@ export default function Controls() {
               <h4
                 className={`font-bold text-large overflow-hidden whitespace-nowrap text-ellipsis px-1`}
               >
-                {app.nowPlaying.title}
+                {app.nowPlaying?.title}
               </h4>
               <p className="text-sm text-zinc-400 overflow-hidden whitespace-nowrap text-ellipsis px-1">
-                {app.nowPlaying.snippet.publishedAt}
+                {snippet.publishedAt}
               </p>
             </div>
           </>
