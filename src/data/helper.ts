@@ -5,25 +5,21 @@ import { getAPIPathMap } from "@/data/apiRoutes";
 import { unstable_cache, revalidateTag } from "next/cache";
 import { headers as nextHeaders } from "next/headers";
 
-/**
- * Represents the available API paths.
- * @typedef {`${API_VERSION}:${API_PATH_FOR_VERSION<API_VERSION>}`} API_PATH
- */
-type API_VERSION = keyof ReturnType<typeof getAPIPathMap>;
-type API_PATH_FOR_VERSION<V extends API_VERSION> = keyof ReturnType<
+type API_SOURCE = keyof ReturnType<typeof getAPIPathMap>;
+type API_PATH_FOR_SOURCE<S extends API_SOURCE> = keyof ReturnType<
   typeof getAPIPathMap
->[V];
-type API_PATH = `${API_VERSION}:${API_PATH_FOR_VERSION<API_VERSION>}`;
+>[S];
 
-/**
- * Represents the response type for a given API path.
- * @template S The API path string literal type
- */
-type DataHelperResponse<S extends API_PATH> = ReturnType<
-  typeof getAPIPathMap
->[S extends `${infer V}:${string}` ? V : never][S extends `${string}:${infer P}`
-  ? P
-  : never]["response"];
+// Create a dynamic API_PATH type using keyof API_SOURCE
+type API_PATH = {
+  [K in API_SOURCE]: `${K}:${API_PATH_FOR_SOURCE<K> & string}`;
+}[API_SOURCE];
+
+type DataHelperResponse<S extends API_PATH> =
+  S extends `${infer V extends API_SOURCE}:${infer M}:${infer P}`
+    ? // @ts-expect-error: This is a workaround to get the response type for a given API path.
+      ReturnType<typeof getAPIPathMap>[V][`${M}:${P}`]["response"]
+    : never;
 
 type FetchMethods =
   | "GET"
@@ -39,7 +35,7 @@ type FetchMethods =
  * @interface RequestOptions
  * @property {API_PATH} url - The API endpoint to request.
  * @property {FetchMethods} [method='GET'] - The HTTP method to use.
- * @property {Record<string, string>} [body] - The body of the request.
+ * @property {Record<string, string> | Record<string, unknown>} [body] - The body of the request.
  * @property {Record<string, string>} [query] - Query parameters for the request.
  * @property {Record<string, string>} [params] - URL parameters for the request.
  * @property {Record<string, string>} [headers] - Custom headers for the request.
@@ -54,7 +50,7 @@ interface RequestOptions<URL extends API_PATH> {
   url: URL;
   origin?: string | null;
   method?: FetchMethods;
-  body?: Record<string, string>;
+  body?: Record<string, string> | Record<string, unknown>;
   query?: Record<string, string>;
   params?: Record<string, string>;
   headers?: Record<string, string>;
@@ -96,12 +92,14 @@ async function fetchAPI<URL extends API_PATH>({
   try {
     const version = url.split(":")[0];
     const method = url.split(":")[1];
-    const apiPath = url.split(":").slice(2).join("");
+    const apiPath = url.split(":").slice(2).join(":");
     const parsedUrl = apiPath.replace(/:(\w+)/g, (_, param) => params[param]);
-    const apiUrl = `${origin}/api/${version}`;
+    const apiSourceFromEnv = process.env[`API_SOURCE_${version.toUpperCase()}`];
+    const apiSource = apiSourceFromEnv?.includes("http")
+      ? `${apiSourceFromEnv.replace(/\/$/, "")}/${parsedUrl}`
+      : `${origin}${apiSourceFromEnv}/${parsedUrl}`;
     const queryString = new URLSearchParams(query).toString();
-    const fullUrl = `${apiUrl}/${parsedUrl}?${queryString}`;
-    console.log("fullUrl", fullUrl);
+    const fullUrl = `${apiSource}${queryString ? `?${queryString}` : ""}`;
 
     const startTime = Date.now();
 
@@ -114,7 +112,7 @@ async function fetchAPI<URL extends API_PATH>({
       ...(method.toLocaleLowerCase() !== "get" && {
         body:
           headers["Content-Type"] === "application/x-www-form-urlencoded"
-            ? new URLSearchParams(body).toString()
+            ? new URLSearchParams(body as Record<string, string>).toString()
             : JSON.stringify(body),
       }),
     });
@@ -151,7 +149,7 @@ async function fetchAPI<URL extends API_PATH>({
     if (contentType && contentType.includes("application/json")) {
       data = (await response.json()) as DataHelperResponse<URL>;
     } else {
-      data = await response.text();
+      data = (await response.text()) as unknown as DataHelperResponse<URL>;
     }
 
     const endTime = Date.now();

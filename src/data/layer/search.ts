@@ -4,7 +4,7 @@ import { DataRequest } from "@/data/helper";
 
 export const SearchYoutube = async ({ query }: { query: string }) => {
   return DataRequest({
-    url: "v1:get:youtube/search",
+    url: "internal:get:youtube/search",
     query: {
       q: `${query.trim().replace(/\s+/g, " ")}, official music`,
     },
