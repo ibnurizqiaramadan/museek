@@ -6,7 +6,9 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { appStore } from "@/stores/AppStores";
 
 export default function Search() {
-  const { setSearch, app, setSearchInput } = appStore((state) => state);
+  const { setSearch, app, setSearchInput, setIsSearchFocused } = appStore(
+    (state) => state,
+  );
   const debounceTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const [stateSearchInput, setStateSearchInput] = useState(app.searchInput);
 
@@ -43,6 +45,8 @@ export default function Search() {
         className="rounded-lg w-full md:w-1/2 lg:w-1/3 p-0 m-0"
         placeholder="Search"
         value={stateSearchInput}
+        onFocus={() => setIsSearchFocused(true)}
+        onBlur={() => setIsSearchFocused(false)}
         onValueChange={(value) => {
           if (value.length === 0) {
             setStateSearchInput("");

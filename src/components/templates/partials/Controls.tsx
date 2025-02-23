@@ -38,11 +38,16 @@ export default function Controls() {
     app.nowPlaying,
   );
 
+  const [isPlayingLocalstorage, setIsPlayingLocalstorage] = useLocalStorage(
+    `is-playing`,
+    app.isMusicPlaying,
+  );
+
   useEffect(() => {
-    if (currentPlaying) {
+    if (currentPlaying && isPlayingLocalstorage) {
       setNowPlaying(currentPlaying);
     }
-  }, [currentPlaying, setNowPlaying]);
+  }, [currentPlaying, isPlayingLocalstorage, setNowPlaying]);
 
   useEffect(() => {
     if (savedProgress) {
@@ -55,6 +60,16 @@ export default function Controls() {
       setVolume(savedVolume);
     }
   }, [savedVolume]);
+
+  useEffect(() => {
+    if (app.isSearchFocused) return;
+    if (app.isMusicPlaying) {
+      audioRef.current?.play();
+    } else {
+      audioRef.current?.pause();
+    }
+    setIsPlayingLocalstorage(app.isMusicPlaying);
+  }, [app.isMusicPlaying, app.isSearchFocused, setIsPlayingLocalstorage]);
 
   useEffect(() => {
     if (app.isMusicPlaying) {

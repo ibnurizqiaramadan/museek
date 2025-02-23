@@ -50,13 +50,11 @@ export default function Layout(props: {
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      console.log(e.key);
-
-      // if (e.key === " ") {
-      //   e.preventDefault();
-      //   e.stopPropagation();
-      //   setIsMusicPlaying(!app.isMusicPlaying);
-      // }
+      if (e.key === " ") {
+        // e.preventDefault();
+        // e.stopPropagation();
+        setIsMusicPlaying(!app.isMusicPlaying);
+      }
     };
 
     window.addEventListener("keydown", handleKeyDown);

@@ -11,6 +11,7 @@ export const appStore = create<AppStore>((set) => ({
     isSidebarVisible: false,
     isMusicPlaying: false,
     isMusicLoading: false,
+    isSearchFocused: false,
     contextMenu: {
       id: null,
       visible: false,
@@ -33,4 +34,6 @@ export const appStore = create<AppStore>((set) => ({
     set((state) => ({ app: { ...state.app, isMusicPlaying } })),
   setIsMusicLoading: (isMusicLoading) =>
     set((state) => ({ app: { ...state.app, isMusicLoading } })),
+  setIsSearchFocused: (isSearchFocused) =>
+    set((state) => ({ app: { ...state.app, isSearchFocused } })),
 }));

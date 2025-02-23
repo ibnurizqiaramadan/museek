@@ -10,6 +10,7 @@ export type AppStore = {
     isSidebarVisible: boolean;
     isMusicPlaying: boolean;
     isMusicLoading: boolean;
+    isSearchFocused: boolean;
     contextMenu: {
       id: string | null;
       visible: boolean;
@@ -25,6 +26,7 @@ export type AppStore = {
   setIsSidebarVisible: (isSidebarVisible: boolean) => void;
   setIsMusicPlaying: (isMusicPlaying: boolean) => void;
   setIsMusicLoading: (isMusicLoading: boolean) => void;
+  setIsSearchFocused: (isSearchFocused: boolean) => void;
   setContextMenu: (contextMenu: {
     id: string | null;
     visible: boolean;
