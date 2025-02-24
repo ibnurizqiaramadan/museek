@@ -16,7 +16,7 @@ export async function GET(req: NextRequest) {
         `/error?message=${Buffer.from(
           JSON.stringify(errorGetQueueByUser),
         ).toString("base64")}`,
-        req.url,
+        req.nextUrl.origin,
       ),
     );
   }
@@ -32,14 +32,14 @@ export async function GET(req: NextRequest) {
       return NextResponse.redirect(
         new URL(
           `/error?message=${Buffer.from(JSON.stringify(errorCreateQueue)).toString("base64")}`,
-          req.url,
+          req.nextUrl.origin,
         ),
       );
     }
     payload.queueId = createQueue?.insert_queue_one.id || "";
   }
 
-  const response = NextResponse.redirect(process.env.APP_BASE_URL); // Redirect to home page
+  const response = NextResponse.redirect(new URL("/", req.nextUrl.origin)); // Redirect to home page
 
   const jwt = await generateJWT(payload);
 
