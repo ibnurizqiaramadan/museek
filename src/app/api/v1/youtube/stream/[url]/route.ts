@@ -5,9 +5,22 @@ import { GetVideo } from "@/server/youtube";
 import fs from "fs";
 import { Readable } from "stream";
 import { GetVideoById } from "@/data/layer/queue";
-
+import { cookies } from "next/headers";
 export async function GET(request: NextRequest) {
   const url = request.nextUrl.pathname.split("/").pop();
+
+  const cookie = await cookies();
+  const accessToken = cookie.get("accessToken");
+
+  const accessedAs = request.headers.get("sec-fetch-dest");
+
+  if (accessedAs !== "audio") {
+    return NextResponse.json({ error: "Not allowed" }, { status: 403 });
+  }
+
+  if (!accessToken) {
+    return NextResponse.json({ error: "No access token" }, { status: 401 });
+  }
 
   const [video, error] = await GetVideoById(url || "");
 
@@ -15,7 +28,11 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "No url provided" }, { status: 400 });
   }
 
-  const file = await GetVideo(video?.queue_items[0]?.video_id || "");
+  if (!video || video.queue_items[0] === undefined) {
+    return NextResponse.json({ error: "No video found" }, { status: 404 });
+  }
+
+  const file = await GetVideo(video.queue_items[0].video_id);
   const stat = fs.statSync(file as string);
   const { size } = stat;
 
