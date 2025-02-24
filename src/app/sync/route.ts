@@ -39,7 +39,11 @@ export async function GET(req: NextRequest) {
     payload.queueId = createQueue?.insert_queue_one.id || "";
   }
 
-  const response = NextResponse.redirect(new URL("/", req.nextUrl.origin)); // Redirect to home page
+  const redirectUrl = new URL("/", process.env.APP_BASE_URL);
+
+  console.log(redirectUrl, process.env.APP_BASE_URL);
+
+  const response = NextResponse.redirect(redirectUrl); // Redirect to home page
 
   const jwt = await generateJWT(payload);
 
