@@ -63,13 +63,13 @@ export default function Controls() {
 
   useEffect(() => {
     if (app.isSearchFocused) return;
+    console.log("app.isMusicPlaying", app.isMusicPlaying);
     if (app.isMusicPlaying) {
       audioRef.current?.play();
     } else {
       audioRef.current?.pause();
     }
-    setIsPlayingLocalstorage(app.isMusicPlaying);
-  }, [app.isMusicPlaying, app.isSearchFocused, setIsPlayingLocalstorage]);
+  }, [app.isMusicPlaying, app.isSearchFocused]);
 
   useEffect(() => {
     if (app.isMusicPlaying) {
@@ -305,11 +305,13 @@ export default function Controls() {
                 setIsMusicPlaying(true);
                 setIsMusicLoading(false);
                 setCurrentPlaying(app.nowPlaying);
+                setIsPlayingLocalstorage(true);
               }}
               onPause={(e) => {
                 e.currentTarget.volume = 0;
                 setIsMusicPlaying(false);
                 setIsMusicLoading(false);
+                setIsPlayingLocalstorage(false);
               }}
             />
           )}

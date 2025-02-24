@@ -3,16 +3,14 @@
 import { Image, Spinner } from "@heroui/react";
 import { appStore } from "@/stores/AppStores";
 import { GetQueueByUserResponse, QueueItemTypes } from "@/data/responseTypes";
-import { useMemo, MouseEvent, useEffect } from "react";
+import { useMemo, MouseEvent } from "react";
 
 const QueueItem = ({
   item,
 }: {
   item: GetQueueByUserResponse["queue"][0]["queue_items_aggregate"]["nodes"][0];
 }) => {
-  const { app, setNowPlaying, setContextMenu, setIsMusicLoading } = appStore(
-    (state) => state,
-  );
+  const { app, setNowPlaying, setContextMenu } = appStore((state) => state);
 
   // Memoize snippet parsing to avoid redundant parsing
   const snippet: QueueItemTypes["snippet"] = useMemo(
@@ -27,11 +25,11 @@ const QueueItem = ({
     setNowPlaying(item);
   };
 
-  useEffect(() => {
-    if (app.nowPlaying?.id !== item.id) {
-      setIsMusicLoading(true);
-    }
-  }, [app.nowPlaying?.id, item.id, setIsMusicLoading]);
+  // useEffect(() => {
+  //   if (app.nowPlaying?.id !== item.id) {
+  //     setIsMusicLoading(true);
+  //   }
+  // }, [app.nowPlaying?.id, item.id, setIsMusicLoading]);
 
   const handleContextMenu = (e: MouseEvent) => {
     e.preventDefault();
