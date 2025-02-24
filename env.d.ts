@@ -1,5 +1,6 @@
 declare namespace NodeJS {
   interface ProcessEnv {
+    APP_BASE_URL: string;
     BACKEND_API_URL: string;
     REDIS_HOST: string;
     REDIS_PORT: string;
