@@ -9,7 +9,7 @@ export default function Search() {
   const { setSearch, app, setSearchInput, setIsSearchFocused } = appStore(
     (state) => state,
   );
-  const debounceTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const debounceTimeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
   const [stateSearchInput, setStateSearchInput] = useState(app.searchInput);
 
   useEffect(() => {
