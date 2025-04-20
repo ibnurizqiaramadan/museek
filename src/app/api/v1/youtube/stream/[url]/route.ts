@@ -6,6 +6,7 @@ import fs from "fs";
 import { Readable } from "stream";
 import { GetVideoById } from "@/data/layer/queue";
 import { cookies } from "next/headers";
+
 export async function GET(request: NextRequest) {
   const url = request.nextUrl.pathname.split("/").pop();
 
@@ -33,39 +34,56 @@ export async function GET(request: NextRequest) {
   }
 
   const file = await GetVideo(video.queue_items[0].video_id);
-  const stat = fs.statSync(file as string);
-  const { size } = stat;
 
-  const range = request.headers.get("range");
-  if (!range) {
-    const fileStream = fs.createReadStream(file as string);
+  // Handle case where file is null (could not be downloaded)
+  if (!file) {
+    return NextResponse.json(
+      { error: "Could not download audio for this video" },
+      { status: 500 },
+    );
+  }
+
+  try {
+    const stat = fs.statSync(file);
+    const { size } = stat;
+
+    const range = request.headers.get("range");
+    if (!range) {
+      const fileStream = fs.createReadStream(file);
+      return new Response(Readable.toWeb(fileStream) as ReadableStream, {
+        headers: {
+          "Content-Type": "audio/mpeg",
+          "Content-Length": size.toString(),
+          "Accept-Ranges": "bytes",
+        },
+      });
+    }
+
+    const [startStr, endStr] = range.replace(/bytes=/, "").split("-");
+    const start = parseInt(startStr, 10);
+    const end = endStr ? parseInt(endStr, 10) : size - 1;
+
+    if (isNaN(start) || start >= size || end >= size || start > end) {
+      return new Response("Invalid Range", { status: 416 });
+    }
+
+    const chunkSize = end - start + 1;
+    const fileStream = fs.createReadStream(file, { start, end });
+
     return new Response(Readable.toWeb(fileStream) as ReadableStream, {
+      status: 206,
       headers: {
         "Content-Type": "audio/mpeg",
-        "Content-Length": size.toString(),
+        "Content-Length": chunkSize.toString(),
+        "Content-Range": `bytes ${start}-${end}/${size}`,
         "Accept-Ranges": "bytes",
       },
     });
+  } catch (error) {
+    console.error("Error streaming file:", error);
+    return NextResponse.json(
+      { error: "Error streaming audio file" },
+      { status: 500 },
+    );
   }
-
-  const [startStr, endStr] = range.replace(/bytes=/, "").split("-");
-  const start = parseInt(startStr, 10);
-  const end = endStr ? parseInt(endStr, 10) : size - 1;
-
-  if (isNaN(start) || start >= size || end >= size || start > end) {
-    return new Response("Invalid Range", { status: 416 });
-  }
-
-  const chunkSize = end - start + 1;
-  const fileStream = fs.createReadStream(file as string, { start, end });
-
-  return new Response(Readable.toWeb(fileStream) as ReadableStream, {
-    status: 206,
-    headers: {
-      "Content-Type": "audio/mpeg",
-      "Content-Length": chunkSize.toString(),
-      "Content-Range": `bytes ${start}-${end}/${size}`,
-      "Accept-Ranges": "bytes",
-    },
-  });
 }
