@@ -10,7 +10,9 @@ const QueueItem = ({
 }: {
   item: GetQueueByUserResponse["queue"][0]["queue_items_aggregate"]["nodes"][0];
 }) => {
-  const { app, setNowPlaying, setContextMenu } = appStore((state) => state);
+  const { app, setNowPlaying, setContextMenu, setIsMusicLoading } = appStore(
+    (state) => state,
+  );
 
   // Memoize snippet parsing to avoid redundant parsing
   const snippet: QueueItemTypes["snippet"] = useMemo(
@@ -22,14 +24,11 @@ const QueueItem = ({
   );
 
   const handleClick = () => {
+    if (app.nowPlaying?.id !== item.id) {
+      setIsMusicLoading(true);
+    }
     setNowPlaying(item);
   };
-
-  // useEffect(() => {
-  //   if (app.nowPlaying?.id !== item.id) {
-  //     setIsMusicLoading(true);
-  //   }
-  // }, [app.nowPlaying?.id, item.id, setIsMusicLoading]);
 
   const handleContextMenu = (e: MouseEvent) => {
     e.preventDefault();
@@ -40,6 +39,9 @@ const QueueItem = ({
       y: e.pageY,
     });
   };
+
+  const isCurrentlyLoading =
+    app.isMusicLoading && app.nowPlaying?.id === item.id;
 
   return (
     <div
@@ -52,7 +54,7 @@ const QueueItem = ({
     >
       <div className="flex flex-row flex-grow items-center max-w-[calc(100%-30px)]">
         <div className="relative">
-          {app.nowPlaying?.id === item.id && app.isMusicLoading && (
+          {isCurrentlyLoading && (
             <Spinner
               size="lg"
               className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-20"
@@ -60,11 +62,10 @@ const QueueItem = ({
           )}
           <Image
             alt="Card background"
-            className={`object-cover rounded-xl w-[80px] h-[80px] min-w-[80px] min-h-[80px] p-2 ${
-              app.isMusicLoading && app.nowPlaying?.id === item.id
-                ? "opacity-40"
-                : ""
-            }`}
+            className={`object-cover rounded-xl w-[80px] h-[80px] min-w-[80px] min-h-[80px] p-2 loading-image-${isCurrentlyLoading ? "active" : "inactive"}`}
+            style={{
+              opacity: isCurrentlyLoading ? 0.4 : 1,
+            }}
             src={snippet.thumbnails.url}
             width={80}
             height={80}

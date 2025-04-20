@@ -34,6 +34,7 @@ export default function Controls() {
   const [firstLoad, setFirstLoad] = useState(false);
   const [retryCount, setRetryCount] = useState(0);
   const maxRetries = 3;
+  const [audioReady, setAudioReady] = useState(false);
 
   const [currentPlaying, setCurrentPlaying] = useLocalStorage(
     `current-playing`,
@@ -44,6 +45,11 @@ export default function Controls() {
     `is-playing`,
     app.isMusicPlaying,
   );
+
+  // Reset audio ready state when track changes
+  useEffect(() => {
+    setAudioReady(false);
+  }, [app.nowPlaying?.id]);
 
   useEffect(() => {
     if (currentPlaying && isPlayingLocalstorage) {
@@ -123,6 +129,9 @@ export default function Controls() {
             : 0;
 
         if (app.queue[nextIndex]) {
+          // Set loading state when automatically changing to next track
+          setIsMusicLoading(true);
+          setAudioReady(false);
           setNowPlaying(app.queue[nextIndex]);
         }
       }
@@ -135,6 +144,7 @@ export default function Controls() {
     setSavedProgress,
     setIsMusicPlaying,
     setIsPlayingLocalstorage,
+    setIsMusicLoading,
   ]);
 
   const handleLoadedMetadata = useCallback(() => {
@@ -148,9 +158,14 @@ export default function Controls() {
       if (app.isMusicPlaying) {
         audioRef.current.pause();
       } else {
+        // Show loading state when play is clicked manually
+        if (!audioReady) {
+          setIsMusicLoading(true);
+        }
         audioRef.current.play().catch((err) => {
           console.error("Play error:", err);
           setIsMusicPlaying(false);
+          setIsMusicLoading(false);
         });
         audioRef.current.volume = volume / 100;
       }
@@ -162,7 +177,9 @@ export default function Controls() {
     app.nowPlaying,
     setCurrentPlaying,
     setIsMusicPlaying,
+    setIsMusicLoading,
     volume,
+    audioReady,
   ]);
 
   const handleProgressClick = useCallback(
@@ -205,8 +222,9 @@ export default function Controls() {
     const currentIndex =
       queue?.findIndex((item) => item.id === nowPlaying?.id) ?? -1;
     const nextIndex = (currentIndex + 1) % (queue?.length || 1);
-    setNowPlaying(queue?.[nextIndex] || null);
+    setAudioReady(false);
     setIsMusicLoading(true);
+    setNowPlaying(queue?.[nextIndex] || null);
   }, [app, setIsMusicLoading, setNowPlaying]);
 
   const handlePrevious = useCallback(() => {
@@ -217,8 +235,9 @@ export default function Controls() {
       queue?.findIndex((item) => item.id === nowPlaying?.id) ?? 0;
     const prevIndex =
       (currentIndex - 1 + (queue?.length || 1)) % (queue?.length || 1);
-    setNowPlaying(queue?.[prevIndex] || null);
+    setAudioReady(false);
     setIsMusicLoading(true);
+    setNowPlaying(queue?.[prevIndex] || null);
   }, [app, setIsMusicLoading, setNowPlaying]);
 
   useEffect(() => {
@@ -354,9 +373,18 @@ export default function Controls() {
               hidden
               onTimeUpdate={handleTimeUpdate}
               onLoadedMetadata={handleLoadedMetadata}
+              onCanPlayThrough={() => {
+                // Audio is fully loaded and ready to play without buffering
+                setAudioReady(true);
+                // Only turn off loading when audio is actually ready to play
+                if (app.isMusicPlaying) {
+                  setIsMusicLoading(false);
+                }
+              }}
               onError={(e) => {
                 console.error("Audio error:", e);
                 setIsMusicLoading(false);
+                setAudioReady(false);
 
                 if (retryCount < maxRetries) {
                   console.log(
@@ -392,7 +420,7 @@ export default function Controls() {
               onPlay={(e) => {
                 e.currentTarget.volume = volume / 100;
                 setIsMusicPlaying(true);
-                setIsMusicLoading(false);
+                // Don't turn off loading state here, wait for canPlayThrough
                 setCurrentPlaying(app.nowPlaying);
                 setIsPlayingLocalstorage(true);
                 setRetryCount(0);
@@ -401,6 +429,10 @@ export default function Controls() {
                 setIsMusicPlaying(false);
                 setIsMusicLoading(false);
                 setIsPlayingLocalstorage(false);
+              }}
+              onWaiting={() => {
+                // Audio is buffering, show loading state
+                setIsMusicLoading(true);
               }}
             />
           )}

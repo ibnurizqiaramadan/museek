@@ -14,7 +14,9 @@ const SearchItems = ({
 }) => {
   const [isAdded, setIsAdded] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const { app, setQueue } = appStore((state) => state);
+  const { app, setQueue, setNowPlaying, setIsMusicLoading } = appStore(
+    (state) => state,
+  );
 
   // Move handler to useCallback to avoid recreating on every render
   const handleAddToQueue = useCallback(async () => {
@@ -45,7 +47,14 @@ const SearchItems = ({
       };
 
       // Update queue state safely
-      setQueue([...(app.queue ?? []), queueItem]);
+      const updatedQueue = [...(app.queue ?? []), queueItem];
+      setQueue(updatedQueue);
+
+      // If this is the first track or no track is currently playing, play it automatically
+      if (!app.nowPlaying || app.queue?.length === 0) {
+        setIsMusicLoading(true);
+        setNowPlaying(queueItem);
+      }
 
       // Only mark as added and show success after queue is updated
       setIsAdded(true);
@@ -68,7 +77,17 @@ const SearchItems = ({
     } finally {
       setIsLoading(false);
     }
-  }, [app.queue, app.queueId, isAdded, isLoading, item, setQueue]);
+  }, [
+    app.queue,
+    app.queueId,
+    app.nowPlaying,
+    isAdded,
+    isLoading,
+    item,
+    setQueue,
+    setNowPlaying,
+    setIsMusicLoading,
+  ]);
 
   return (
     <div
