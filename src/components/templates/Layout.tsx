@@ -11,19 +11,14 @@ import { useEffect } from "react";
 import ContextMenu from "@/components/ContextMenu/ContextMenu";
 import { GetQueueByUserResponse } from "@/data/responseTypes";
 import { decodeJWT } from "@/server/jwt";
+import Image from "next/image";
 
 export default function Layout(props: {
   queue: GetQueueByUserResponse["queue"][0]["queue_items_aggregate"]["nodes"];
   accessToken: string;
 }) {
-  const {
-    app,
-    setIsSidebarVisible,
-    setContextMenu,
-    setIsMusicPlaying,
-    setQueue,
-    setQueueId,
-  } = appStore((state) => state);
+  const { app, setIsSidebarVisible, setContextMenu, setQueue, setQueueId } =
+    appStore((state) => state);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -47,21 +42,6 @@ export default function Layout(props: {
       window.removeEventListener("resize", handleResize);
     };
   }, [setIsSidebarVisible]);
-
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === " ") {
-        // e.preventDefault();
-        // e.stopPropagation();
-        setIsMusicPlaying(!app.isMusicPlaying);
-      }
-    };
-
-    window.addEventListener("keydown", handleKeyDown);
-    return () => {
-      window.removeEventListener("keydown", handleKeyDown);
-    };
-  }, [app.isMusicPlaying, setIsMusicPlaying]);
 
   return (
     <HeroUIProvider className="h-dvh select-none">
@@ -90,7 +70,16 @@ export default function Layout(props: {
             });
           }}
         ></div>
-        <Search />
+        <div className="flex flex-row items-center gap-3 pr-2">
+          <Search />
+          <Image
+            src="/icons/user-icon.webp"
+            alt="logo"
+            width={32}
+            height={32}
+            className="rounded-full bg-white w-10 h-10 cursor-pointer"
+          />
+        </div>
         <div
           className={`flex flex-row gap-3 ${
             app.isSidebarVisible ? "" : ""

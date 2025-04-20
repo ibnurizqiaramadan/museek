@@ -2,14 +2,10 @@
 
 import { appStore } from "@/stores/AppStores";
 import SearchItems from "@/components/search/SearchItems";
-import { memo, useEffect } from "react";
+import { memo } from "react";
 
 const Sidebar = () => {
   const { app } = appStore((state) => state);
-
-  useEffect(() => {
-    console.log(app.search);
-  }, [app.search]);
 
   return (
     <div className={`bg-zinc-900 rounded-lg h-full w-full p-2 `}>

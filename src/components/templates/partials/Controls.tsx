@@ -27,11 +27,13 @@ export default function Controls() {
   );
   const [progress, setProgress] = useState(0);
   const [duration, setDuration] = useState(0);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const audioRef = useRef<HTMLAudioElement>(null);
   const [volume, setVolume] = useState<number>(50);
   const [savedVolume, setSavedVolume] = useLocalStorage("volume", 50);
   const [savedProgress, setSavedProgress] = useLocalStorage("progress", 0);
   const [firstLoad, setFirstLoad] = useState(false);
+  const [retryCount, setRetryCount] = useState(0);
+  const maxRetries = 3;
 
   const [currentPlaying, setCurrentPlaying] = useLocalStorage(
     `current-playing`,
@@ -355,6 +357,37 @@ export default function Controls() {
               onError={(e) => {
                 console.error("Audio error:", e);
                 setIsMusicLoading(false);
+
+                if (retryCount < maxRetries) {
+                  console.log(
+                    `Retrying playback (${retryCount + 1}/${maxRetries})...`,
+                  );
+                  setRetryCount(retryCount + 1);
+
+                  setTimeout(() => {
+                    if (audioRef.current) {
+                      const currentSrc = audioRef.current.src;
+                      audioRef.current.src = "";
+                      audioRef.current.src = currentSrc;
+                      audioRef.current.load();
+                      audioRef.current.play().catch((err) => {
+                        console.error("Retry play error:", err);
+                      });
+                    }
+                  }, 1000);
+                } else {
+                  console.error("Max retries reached, unable to play track");
+
+                  if (app.queue && app.queue.length > 1) {
+                    const currentIndex = app.queue.findIndex(
+                      (item) => item.id === app.nowPlaying?.id,
+                    );
+                    const nextIndex = (currentIndex + 1) % app.queue.length;
+
+                    setNowPlaying(app.queue[nextIndex]);
+                    setRetryCount(0);
+                  }
+                }
               }}
               onPlay={(e) => {
                 e.currentTarget.volume = volume / 100;
@@ -362,6 +395,7 @@ export default function Controls() {
                 setIsMusicLoading(false);
                 setCurrentPlaying(app.nowPlaying);
                 setIsPlayingLocalstorage(true);
+                setRetryCount(0);
               }}
               onPause={() => {
                 setIsMusicPlaying(false);
