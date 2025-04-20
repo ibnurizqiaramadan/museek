@@ -8,7 +8,7 @@ import { GetQueueByUser } from "@/data/layer/queue";
 async function handleUserCreation() {
   const [user, error] = await CreateUser();
   if (error) {
-    console.error("error", error);
+    console.error("User creation error:", error);
     redirect(
       `/error?message=${Buffer.from(JSON.stringify(error)).toString("base64")}`,
     );
@@ -31,18 +31,16 @@ export default async function Home() {
 
   const [user, error] = await GetUser(decoded?.payload?.userId || "");
   if (error || !user?.users[0]?.id) {
-    console.error("User retrieval error", error);
+    console.error("User retrieval error:", error);
     const newUserId = await handleUserCreation();
     return redirect(`/sync?userId=${newUserId}`);
   }
 
   const [queue, errorQueue] = await GetQueueByUser(user?.users[0]?.id || "");
   if (errorQueue) {
-    console.error("Queue retrieval error", errorQueue);
+    console.error("Queue retrieval error:", errorQueue);
     return <div>Error fetching queue</div>;
   }
-
-  console.log("queue", queue);
 
   return (
     <Layout
