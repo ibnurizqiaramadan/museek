@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { appStore } from "@/stores/AppStores";
-import { useMemo, useState, useRef, useEffect } from "react";
+import { useMemo, useState, useRef, useEffect, useCallback } from "react";
 import { Slider } from "@heroui/react";
 import { useLocalStorage } from "usehooks-ts";
 import { FaPlay, FaPause, FaStepBackward, FaStepForward } from "react-icons/fa";
@@ -63,26 +63,27 @@ export default function Controls() {
 
   useEffect(() => {
     if (app.isSearchFocused) return;
-    console.log("app.isMusicPlaying", app.isMusicPlaying);
     if (app.isMusicPlaying) {
-      audioRef.current?.play();
+      audioRef.current
+        ?.play()
+        .catch((err) => console.error("Play error:", err));
     } else {
       audioRef.current?.pause();
     }
   }, [app.isMusicPlaying, app.isSearchFocused]);
 
   useEffect(() => {
-    if (app.isMusicPlaying) {
-      if (audioRef.current) {
-        audioRef.current.play();
-        if (savedProgress && !firstLoad) {
-          audioRef.current.currentTime = savedProgress / 1000;
-          setFirstLoad(true);
-        }
+    if (app.isMusicPlaying && audioRef.current) {
+      audioRef.current.play().catch((err) => {
+        console.error("Play error:", err);
+        setIsMusicPlaying(false);
+      });
+      if (savedProgress && !firstLoad) {
+        audioRef.current.currentTime = savedProgress / 1000;
+        setFirstLoad(true);
       }
-      return;
     }
-  }, [app.isMusicPlaying, firstLoad, savedProgress]);
+  }, [app.isMusicPlaying, firstLoad, savedProgress, setIsMusicPlaying]);
 
   const formattedProgress = useMemo(() => formatTime(progress), [progress]);
   const formattedDuration = useMemo(() => formatTime(duration), [duration]);
@@ -93,93 +94,144 @@ export default function Controls() {
     }
   }, [volume]);
 
-  const handleTimeUpdate = () => {
+  const handleTimeUpdate = useCallback(() => {
     if (audioRef.current) {
       const currentTime = audioRef.current.currentTime * 1000;
+      setProgress(currentTime);
       setSavedProgress(currentTime);
-      if (currentTime >= duration) {
-        const currentIndex = app.queue?.findIndex(
+      if (currentTime >= duration && app.queue) {
+        if (app.queue.length === 1) {
+          audioRef.current.currentTime = 0;
+          setProgress(0);
+          setSavedProgress(0);
+          audioRef.current.play().catch((err) => {
+            console.error("Play error on repeat:", err);
+            setIsMusicPlaying(false);
+            setIsPlayingLocalstorage(false);
+          });
+          return;
+        }
+
+        const currentIndex = app.queue.findIndex(
           (item) => item.id === app.nowPlaying?.id,
         );
         const nextIndex =
-          currentIndex !== undefined && currentIndex >= 0
+          currentIndex >= 0 && currentIndex + 1 < app.queue.length
             ? currentIndex + 1
             : 0;
 
-        // Check if the next index is within bounds
-        if (app.queue && nextIndex < app.queue.length) {
+        if (app.queue[nextIndex]) {
           setNowPlaying(app.queue[nextIndex]);
-        } else {
-          // If the end of the queue is reached, go back to the first item
-          setNowPlaying(app.queue?.[0] || null);
         }
       }
     }
-  };
+  }, [
+    app.queue,
+    app.nowPlaying?.id,
+    duration,
+    setNowPlaying,
+    setSavedProgress,
+    setIsMusicPlaying,
+    setIsPlayingLocalstorage,
+  ]);
 
-  const handleLoadedMetadata = () => {
+  const handleLoadedMetadata = useCallback(() => {
     if (audioRef.current) {
       setDuration(audioRef.current.duration * 1000);
     }
-  };
+  }, []);
 
-  const handlePlay = () => {
+  const handlePlay = useCallback(() => {
     if (audioRef.current) {
       if (app.isMusicPlaying) {
         audioRef.current.pause();
       } else {
-        audioRef.current.play();
+        audioRef.current.play().catch((err) => {
+          console.error("Play error:", err);
+          setIsMusicPlaying(false);
+        });
         audioRef.current.volume = volume / 100;
       }
       setIsMusicPlaying(!app.isMusicPlaying);
       setCurrentPlaying(app.nowPlaying);
     }
-  };
+  }, [
+    app.isMusicPlaying,
+    app.nowPlaying,
+    setCurrentPlaying,
+    setIsMusicPlaying,
+    volume,
+  ]);
 
-  const handleProgressClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    const progressBar = e.currentTarget;
-    const clickPosition = e.clientX - progressBar.getBoundingClientRect().left;
-    const newTime = (clickPosition / progressBar.clientWidth) * duration;
-    if (audioRef.current) {
-      audioRef.current.currentTime = newTime / 1000;
-      setProgress(newTime);
-    }
-  };
+  const handleProgressClick = useCallback(
+    (e: React.MouseEvent<HTMLDivElement>) => {
+      e.preventDefault();
+      const progressBar = e.currentTarget;
+      const clickPosition =
+        e.clientX - progressBar.getBoundingClientRect().left;
+      const newTime = (clickPosition / progressBar.clientWidth) * duration;
+      if (audioRef.current) {
+        audioRef.current.currentTime = newTime / 1000;
+        setProgress(newTime);
+      }
+    },
+    [duration],
+  );
 
-  const handleSliderChange = (value: number) => {
+  const handleSliderChange = useCallback((value: number) => {
     if (audioRef.current) {
       audioRef.current.currentTime = value / 1000;
       setProgress(value);
     }
-  };
+  }, []);
 
-  const handleVolumeChange = (value: number) => {
-    setVolume(value);
-    setSavedVolume(value);
-    if (audioRef.current) {
-      audioRef.current.volume = value / 100;
-    }
-  };
+  const handleVolumeChange = useCallback(
+    (value: number) => {
+      setVolume(value);
+      setSavedVolume(value);
+      if (audioRef.current) {
+        audioRef.current.volume = value / 100;
+      }
+    },
+    [setSavedVolume],
+  );
 
-  const handleNext = () => {
+  const handleNext = useCallback(() => {
     const { queue, nowPlaying } = app;
+    if (!queue?.length) return;
+
     const currentIndex =
       queue?.findIndex((item) => item.id === nowPlaying?.id) ?? -1;
     const nextIndex = (currentIndex + 1) % (queue?.length || 1);
     setNowPlaying(queue?.[nextIndex] || null);
     setIsMusicLoading(true);
-  };
+  }, [app, setIsMusicLoading, setNowPlaying]);
 
-  const handlePrevious = () => {
+  const handlePrevious = useCallback(() => {
     const { queue, nowPlaying } = app;
+    if (!queue?.length) return;
+
     const currentIndex =
       queue?.findIndex((item) => item.id === nowPlaying?.id) ?? 0;
     const prevIndex =
       (currentIndex - 1 + (queue?.length || 1)) % (queue?.length || 1);
     setNowPlaying(queue?.[prevIndex] || null);
     setIsMusicLoading(true);
-  };
+  }, [app, setIsMusicLoading, setNowPlaying]);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === " " && !app.isSearchFocused) {
+        e.preventDefault();
+        setIsMusicPlaying(!app.isMusicPlaying);
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [app.isMusicPlaying, app.isSearchFocused, setIsMusicPlaying]);
 
   const snippet: QueueItemTypes["snippet"] = useMemo(
     () =>
@@ -300,6 +352,10 @@ export default function Controls() {
               hidden
               onTimeUpdate={handleTimeUpdate}
               onLoadedMetadata={handleLoadedMetadata}
+              onError={(e) => {
+                console.error("Audio error:", e);
+                setIsMusicLoading(false);
+              }}
               onPlay={(e) => {
                 e.currentTarget.volume = volume / 100;
                 setIsMusicPlaying(true);
@@ -307,8 +363,7 @@ export default function Controls() {
                 setCurrentPlaying(app.nowPlaying);
                 setIsPlayingLocalstorage(true);
               }}
-              onPause={(e) => {
-                e.currentTarget.volume = 0;
+              onPause={() => {
                 setIsMusicPlaying(false);
                 setIsMusicLoading(false);
                 setIsPlayingLocalstorage(false);
